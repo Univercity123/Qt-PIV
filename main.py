@@ -8,7 +8,7 @@ matplotlib.use('Agg')  # 使用非交互式后端
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer, QMutex, QMutexLocker
 from Ui_PIV import Ui_MainWindow  # 导入上传文件中的UI类
 
 # 解决 Qt 插件问题
@@ -19,7 +19,8 @@ class CameraThread(QThread):
     change_pixmap_signal = pyqtSignal(object)
     camera_status_signal = pyqtSignal(str)
     connection_status_signal = pyqtSignal(bool)
-    fps_signal = pyqtSignal(float)  # 新增：帧率信号
+    fps_signal = pyqtSignal(float)
+    flow_field_signal = pyqtSignal(np.ndarray, np.ndarray)
 
     def __init__(self, camera_index=0):
         super().__init__()
@@ -29,19 +30,23 @@ class CameraThread(QThread):
         self.connected = False
         self.opened = False
         self.last_frame = None
+        self.prev_frame = None
+        self.prev_gray = None
         self.frame_count = 0
         self.start_time = 0
         self.fps = 0.0
+        self.mutex = QMutex()  # 添加互斥锁
+        self.flow_enabled = True  # 控制是否计算光流
+        self.flow_counter = 0  # 控制光流计算频率
+        self.flow_interval = 3  # 每3帧计算一次光流
 
     def run(self):
         self.running = True
         
-        # 检查摄像头是否已连接
         if not self.connected:
             self.camera_status_signal.emit("摄像头未连接")
             return
             
-        # 尝试打开摄像头
         try:
             self.cap = cv2.VideoCapture(self.camera_index)
             if not self.cap.isOpened():
@@ -51,28 +56,44 @@ class CameraThread(QThread):
             self.opened = True
             self.camera_status_signal.emit("摄像头已打开")
             
-            # 初始化帧率计算
             self.frame_count = 0
             self.start_time = time.time()
+            self.prev_frame = None
+            self.prev_gray = None
             
             while self.running:
                 ret, frame = self.cap.read()
-                if ret:
+                if not ret:
+                    break
+                    
+                with QMutexLocker(self.mutex):  # 使用互斥锁保护共享资源
                     self.last_frame = frame
                     self.frame_count += 1
                     
                     # 计算帧率
                     current_time = time.time()
                     elapsed_time = current_time - self.start_time
-                    if elapsed_time > 1.0:  # 每秒更新一次帧率
+                    if elapsed_time > 1.0:
                         self.fps = self.frame_count / elapsed_time
                         self.fps_signal.emit(self.fps)
                         self.frame_count = 0
                         self.start_time = current_time
                     
+                    # 发送当前帧
                     self.change_pixmap_signal.emit(frame)
-                else:
-                    break
+                    
+                    # 计算光流（每flow_interval帧计算一次）
+                    if self.flow_enabled and self.prev_frame is not None:
+                        self.flow_counter += 1
+                        if self.flow_counter % self.flow_interval == 0:
+                            # 计算光流
+                            u, v = self.calculate_optical_flow(self.prev_frame, frame)
+                            if u is not None and v is not None:
+                                self.flow_field_signal.emit(u, v)
+                    
+                    # 更新前一帧
+                    self.prev_frame = frame.copy()
+                    self.prev_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     
             self.cap.release()
             self.opened = False
@@ -83,7 +104,55 @@ class CameraThread(QThread):
 
     def stop(self):
         self.running = False
-        self.wait()
+        self.wait(500)  # 等待最多500毫秒
+
+    def calculate_optical_flow(self, prev_frame, current_frame):
+        """计算两帧之间的光流（优化版）"""
+        try:
+            # 如果已有灰度图，直接使用
+            if self.prev_gray is None:
+                prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+            else:
+                prev_gray = self.prev_gray
+                
+            current_gray = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
+            
+            # 缩小图像以提高性能
+            scale = 0.5  # 缩小到一半大小
+            small_prev = cv2.resize(prev_gray, (0, 0), fx=scale, fy=scale)
+            small_current = cv2.resize(current_gray, (0, 0), fx=scale, fy=scale)
+            
+            # 使用Farneback方法计算稠密光流
+            flow = cv2.calcOpticalFlowFarneback(
+                small_prev, 
+                small_current, 
+                None,
+                0.5,   # pyr_scale
+                2,     # levels (减少层数)
+                15,    # winsize
+                2,     # iterations (减少迭代次数)
+                5,     # poly_n
+                1.1,   # poly_sigma
+                0      # flags
+            )
+            
+            # 分离u和v分量
+            u = flow[..., 0]
+            v = flow[..., 1]
+            
+            # 放大回原始尺寸
+            u = cv2.resize(u, (prev_gray.shape[1], prev_gray.shape[0]), interpolation=cv2.INTER_LINEAR)
+            v = cv2.resize(v, (prev_gray.shape[1], prev_gray.shape[0]), interpolation=cv2.INTER_LINEAR)
+            
+            # 调整比例
+            u /= scale
+            v /= scale
+            
+            return u, v
+            
+        except Exception as e:
+            print(f"光流计算错误: {e}")
+            return None, None
 
     def connect_camera(self):
         """模拟连接摄像头的过程"""
@@ -108,6 +177,91 @@ class CameraThread(QThread):
         # 这里可以添加实际的摄像头设置代码
         self.camera_status_signal.emit("摄像头设置已应用")
 
+class FlowVisualizer(QThread):
+    """独立的流场可视化线程"""
+    visualization_ready = pyqtSignal(object)  # 信号：可视化结果已准备好
+    
+    def __init__(self, u, v, width, height):
+        super().__init__()
+        self.u = u
+        self.v = v
+        self.width = width
+        self.height = height
+        self.mutex = QMutex()
+        self.active = True
+    
+    def run(self):
+        if not self.active or self.u is None or self.v is None:
+            return
+            
+        try:
+            # 计算速度大小
+            magnitude = np.sqrt(self.u**2 + self.v**2)
+            
+            # 创建图像
+            fig = plt.figure(figsize=(self.width/100, self.height/100), dpi=100)
+            ax = fig.add_subplot(111)
+            
+            # 显示速度大小热力图
+            im = ax.imshow(magnitude, cmap='viridis', origin='upper')
+            plt.colorbar(im, ax=ax, label='Speed')
+            
+            # 稀疏箭头图
+            step = 16  # 箭头步长
+            h, w = magnitude.shape
+            quiver_x = np.arange(0, w, step)
+            quiver_y = np.arange(0, h, step)
+            X, Y = np.meshgrid(quiver_x, quiver_y)
+            
+            # 获取箭头位置的速度
+            U = self.u[Y, X]
+            V = self.v[Y, X]
+            
+            # 过滤掉非常小的向量
+            speed_threshold = 0.1
+            mask = np.sqrt(U**2 + V**2) > speed_threshold
+            X = X[mask]
+            Y = Y[mask]
+            U = U[mask]
+            V = V[mask]
+            
+            # 绘制箭头
+            if len(X) > 0:
+                ax.quiver(X, Y, U, V, 
+                          color='red', scale=20, scale_units='inches', 
+                          angles='xy', width=0.002, headwidth=3)
+            
+            ax.set_title("Flow Field")
+            ax.set_xlabel("X")
+            ax.set_ylabel("Y")
+            
+            # 转换为QPixmap
+            canvas = FigureCanvasAgg(fig)
+            canvas.draw()
+            buf = canvas.buffer_rgba()
+            image = np.asarray(buf)
+            
+            # 转换为QImage
+            height, width, channel = image.shape
+            bytes_per_line = 4 * width
+            q_image = QtGui.QImage(image.data, width, height, bytes_per_line, QtGui.QImage.Format_RGBA8888)
+            
+            # 转换为QPixmap
+            pixmap = QtGui.QPixmap.fromImage(q_image)
+            
+            # 发送结果
+            self.visualization_ready.emit(pixmap)
+            
+            # 清理资源
+            plt.close(fig)
+            
+        except Exception as e:
+            print(f"流场可视化错误: {e}")
+    
+    def stop(self):
+        self.active = False
+        self.wait()
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -118,19 +272,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.camera_thread = CameraThread()
         self.camera_index = 0
         self.zoom_factor = 1.0
-        self.fps = 0.0  # 当前帧率
-        self.is_fullscreen = False  # 全屏状态标志
+        self.fps = 0.0
+        self.is_fullscreen = False
         
-        # 添加全屏窗口变量
-        self.fullscreen_window = None
-        self.fullscreen_label = None
-        self.pre_fullscreen_zoom = 1.0  # 保存进入全屏前的缩放比例
+        # 流场相关变量
+        self.flow_u = None
+        self.flow_v = None
+        self.flow_visualizer = None  # 流场可视化线程
         
-        # 流场动画相关变量
-        self.flow_time = 0.0  # 流场时间变量
-        self.flow_timer = QTimer(self)  # 用于更新流场的定时器
-        self.flow_timer.timeout.connect(self.update_flow_field)
-        self.flow_update_interval = 100  # 流场更新间隔(毫秒)
+        # 性能优化
+        self.last_flow_time = 0
+        self.flow_min_interval = 0.3  # 流场更新最小间隔（秒）
         
         # 连接信号和槽
         self.connect_actions()
@@ -142,12 +294,12 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # 设置初始状态
         self.ui.statusbar.showMessage("就绪")
-        
-        # 初始禁用相机相关按钮
         self.update_camera_buttons_state(False)
-        
-        # 安装事件过滤器
         self.ui.label_5.installEventFilter(self)
+        
+        # 设置Matplotlib使用英文字体
+        plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif']
+        plt.rcParams['axes.unicode_minus'] = False
 
     def eventFilter(self, source, event):
         """事件过滤器，用于检测鼠标双击事件"""
@@ -174,7 +326,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionNew_Experiment_9.triggered.connect(self.zoom_out)
         self.ui.actionNew_Experiment_10.triggered.connect(self.zoom_in)
         self.ui.actionNew_Experiment_11.triggered.connect(self.zoom_fit)
-        self.ui.actionNew_Experiment_16.triggered.connect(self.toggle_fullscreen)  # 新增：全屏切换
+        self.ui.actionNew_Experiment_16.triggered.connect(self.toggle_fullscreen)  # 全屏切换
         
         # 图像导航
         self.ui.actionNew_Experiment_12.triggered.connect(self.first_image)
@@ -197,7 +349,56 @@ class MainWindow(QtWidgets.QMainWindow):
         self.camera_thread.change_pixmap_signal.connect(self.update_display)
         self.camera_thread.camera_status_signal.connect(self.update_status)
         self.camera_thread.connection_status_signal.connect(self.update_camera_buttons_state)
-        self.camera_thread.fps_signal.connect(self.update_fps)  # 连接帧率信号
+        self.camera_thread.fps_signal.connect(self.update_fps)
+        self.camera_thread.flow_field_signal.connect(self.update_real_flow_field)  # 连接流场信号
+
+    def update_real_flow_field(self, u, v):
+        """更新真实流场数据（性能优化版）"""
+        current_time = time.time()
+        
+        # 限制流场更新频率
+        if current_time - self.last_flow_time < self.flow_min_interval:
+            return
+            
+        self.last_flow_time = current_time
+        
+        self.flow_u = u
+        self.flow_v = v
+        
+        # 停止现有的可视化线程
+        if self.flow_visualizer is not None:
+            self.flow_visualizer.stop()
+            self.flow_visualizer = None
+        
+        # 获取显示区域尺寸
+        label_width = self.ui.label_6.width()
+        label_height = self.ui.label_6.height()
+        
+        # 创建新的可视化线程
+        self.flow_visualizer = FlowVisualizer(u, v, label_width, label_height)
+        self.flow_visualizer.visualization_ready.connect(self.update_flow_display)
+        self.flow_visualizer.start()
+        
+        # 在状态栏显示流场信息
+        if u is not None and v is not None:
+            avg_u = np.mean(u)
+            avg_v = np.mean(v)
+            max_speed = np.max(np.sqrt(u**2 + v**2))
+            self.ui.statusbar.showMessage(f"流场更新 | 平均速度: U={avg_u:.2f}, V={avg_v:.2f} | 最大速度: {max_speed:.2f}")
+
+    def update_flow_display(self, pixmap):
+        """更新流场显示（由可视化线程调用）"""
+        if pixmap and not pixmap.isNull():
+            # 适当缩放以适合标签
+            scaled_pixmap = pixmap.scaled(
+                self.ui.label_6.width(),
+                self.ui.label_6.height(),
+                QtCore.Qt.KeepAspectRatio,
+                QtCore.Qt.SmoothTransformation
+            )
+            self.ui.label_6.setPixmap(scaled_pixmap)
+        else:
+            self.clear_flow_display("流场数据无效")
 
     def link_camera(self):
         """连接摄像头"""
@@ -216,14 +417,14 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.camera_thread.isRunning():
             self.camera_thread.stop()
             
+        # 重置前一帧
+        self.camera_thread.prev_frame = None
+        
         self.camera_thread.start()
         self.ui.statusbar.showMessage("正在打开摄像头...")
         
-        # 在label6上显示流场箭头图
-        self.generate_flow_field()
-        
-        # 启动流场更新定时器
-        self.flow_timer.start(self.flow_update_interval)
+        # 清除流场显示
+        self.clear_flow_display("计算流场中...")
 
     def set_camera(self):
         """设置摄像头"""
@@ -233,30 +434,6 @@ class MainWindow(QtWidgets.QMainWindow):
             
         self.camera_thread.set_camera_settings()
         self.ui.statusbar.showMessage("正在设置摄像头...")
-
-    def close_camera(self):
-        """关闭摄像头 - 关键功能实现点"""
-        if self.camera_thread.isRunning():
-            # 停止线程
-            self.camera_thread.stop()
-            # 停止流场更新定时器
-            self.flow_timer.stop()
-            
-            # 清除画面
-            self.clear_display("摄像头已关闭")
-            self.clear_flow_display("流场图未生成")
-            self.ui.statusbar.showMessage("摄像头已关闭")
-            
-            # 如果全屏，退出全屏
-            if self.is_fullscreen:
-                self.exit_fullscreen()
-        else:
-            self.ui.statusbar.showMessage("摄像头未打开")
-            self.clear_display("摄像头未打开")
-            self.clear_flow_display("流场图未生成")
-            
-        # 更新摄像头按钮状态
-        self.update_camera_buttons_state(self.camera_thread.connected)
 
     def update_camera_buttons_state(self, connected):
         """根据摄像头连接状态更新按钮状态"""
@@ -347,7 +524,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.statusbar.showMessage(f"图像处理错误: {e}")
 
     def clear_display(self, message="摄像头未连接"):
-        """清除显示画面并显示消息 - 关键功能实现点"""
+        """清除显示画面并显示消息"""
         # 获取label的尺寸
         label_width = max(1, self.ui.label_5.width())
         label_height = max(1, self.ui.label_5.height())
@@ -372,29 +549,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_5.setPixmap(background)
         
     def clear_flow_display(self, message="流场图未生成"):
-        """清除流场显示画面并显示消息"""
-        # 获取label的尺寸
-        label_width = max(1, self.ui.label_6.width())
-        label_height = max(1, self.ui.label_6.height())
+        """清除流场显示画面并显示消息（优化版）"""
+        # 创建简单的文本图像，避免复杂的绘制
+        pixmap = QtGui.QPixmap(self.ui.label_6.size())
+        pixmap.fill(QtGui.QColor(0, 0, 0))  # 黑色背景
         
-        # 创建黑色背景
-        background = QtGui.QPixmap(label_width, label_height)
-        background.fill(QtGui.QColor(0, 0, 0))  # 黑色背景
-        
-        # 创建并配置文本
-        painter = QtGui.QPainter(background)
+        painter = QtGui.QPainter(pixmap)
         painter.setPen(QtGui.QColor(255, 255, 255))  # 白色文字
-        painter.setFont(QtGui.QFont("Arial", 16))
+        painter.setFont(QtGui.QFont("Arial", 14))
         
         # 居中绘制文本
         text_rect = painter.fontMetrics().boundingRect(message)
-        x = (label_width - text_rect.width()) // 2
-        y = (label_height + text_rect.height()) // 2
+        x = (pixmap.width() - text_rect.width()) // 2
+        y = (pixmap.height() + text_rect.height()) // 2
         painter.drawText(x, y, message)
         painter.end()
         
-        # 设置label的pixmap
-        self.ui.label_6.setPixmap(background)
+        self.ui.label_6.setPixmap(pixmap)
 
     def update_status(self, message):
         """更新状态信息"""
@@ -510,7 +681,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.update_display(self.camera_thread.last_frame)
         else:
             self.update_camera_display_state()
-    
+
     def update_fullscreen_display(self, pixmap):
         """更新全屏显示"""
         if not self.is_fullscreen or not self.fullscreen_label:
@@ -557,24 +728,50 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.clear_display("摄像头未连接")
 
-    def force_layout_update(self):
-        """强制更新布局"""
-        self.ui.centralwidget.updateGeometry()
-        self.ui.label_5.updateGeometry()
-        self.update()
-        
-        # 如果摄像头在运行，更新显示
-        if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
-            self.update_display(self.camera_thread.last_frame)
+    def close_camera(self):
+        """关闭摄像头 - 关键功能实现点"""
+        if self.camera_thread.isRunning():
+            # 停止线程
+            self.camera_thread.stop()
+            
+            # 清除画面
+            self.clear_display("摄像头已关闭")
+            self.clear_flow_display("流场图未生成")
+            self.ui.statusbar.showMessage("摄像头已关闭")
+            
+            # 清除流场数据
+            self.flow_u = None
+            self.flow_v = None
+            
+            # 停止流场可视化线程
+            if self.flow_visualizer is not None:
+                self.flow_visualizer.stop()
+                self.flow_visualizer = None
         else:
-            # 根据当前状态更新显示
-            if self.camera_thread.connected:
-                if self.camera_thread.opened:
-                    self.clear_display("摄像头已关闭")
-                else:
-                    self.clear_display("摄像头已连接，请点击'打开相机'")
-            else:
-                self.clear_display("摄像头未连接")
+            self.ui.statusbar.showMessage("摄像头未打开")
+            self.clear_display("摄像头未打开")
+            self.clear_flow_display("流场图未生成")
+            
+        self.update_camera_buttons_state(self.camera_thread.connected)
+        
+        if self.is_fullscreen:
+            self.exit_fullscreen()
+
+    def closeEvent(self, event):
+        """窗口关闭时停止所有线程"""
+        if self.camera_thread.isRunning():
+            self.camera_thread.stop()
+            
+        if self.flow_visualizer is not None:
+            self.flow_visualizer.stop()
+            
+        if self.is_fullscreen:
+            self.exit_fullscreen()
+            
+        # 清除画面
+        self.clear_display("应用程序已关闭")
+        self.clear_flow_display("流场图未生成")
+        event.accept()
 
     def first_image(self):
         """导航到第一张图像"""
@@ -619,8 +816,26 @@ class MainWindow(QtWidgets.QMainWindow):
     def capture(self):
         """捕获图像"""
         self.ui.statusbar.showMessage("正在捕获图像...")
-        # 捕获时重新生成流场图
-        self.generate_flow_field()
+        # 这里可以添加保存当前帧和流场数据的代码
+        if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
+            # 保存当前帧
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            frame_filename = f"capture_{timestamp}.png"
+            cv2.imwrite(frame_filename, self.camera_thread.last_frame)
+            
+            # 保存流场数据（如果可用）
+            if self.flow_u is not None and self.flow_v is not None:
+                flow_filename = f"flowfield_{timestamp}.npz"
+                np.savez(flow_filename, u=self.flow_u, v=self.flow_v)
+                
+                # 保存流场图像
+                flow_img_filename = f"flowfield_{timestamp}.png"
+                if self.ui.label_6.pixmap():
+                    self.ui.label_6.pixmap().save(flow_img_filename)
+            
+            self.ui.statusbar.showMessage(f"已保存捕获: {frame_filename} 和流场数据")
+        else:
+            self.ui.statusbar.showMessage("没有可捕获的图像")
 
     def grab_stop(self):
         """停止抓取"""
@@ -633,160 +848,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def save_setup(self):
         """保存设置"""
         self.ui.statusbar.showMessage("设置已保存")
-        
-    def plot_flow_field(self, u, v, output_file=None, magFlag=True, slFlag=True, step=1, quiver_step=16):
-        """
-        可视化速度场：
-        - 背景：速度大小的热力图
-        - 前景：流线图 + 稀疏箭头图（quiver）
-
-        参数：
-        - u, v: 速度场的两个分量，形状 [H, W]
-        - step: 背景图采样间隔（默认=1，表示全分辨率）
-        - quiver_step: 箭头稀疏采样间隔（默认=16）
-        """
-        H, W = u.shape
-        x = np.arange(0, H)
-        y = np.arange(0, W)
-        xx, yy = np.meshgrid(x, y, indexing='ij')
-
-        # 速度大小
-        magnitude = np.sqrt(u**2 + v**2)
-
-        fig = plt.figure(figsize=(6, 5))
-        ax = fig.add_subplot(111)
-        
-        # 背景热力图（速度大小）
-        if magFlag:
-            im = ax.imshow(magnitude[::step, ::step], cmap='viridis', origin='lower')
-            plt.colorbar(im, ax=ax, label='Speed Magnitude')
-        else:
-            im = ax.imshow(0*magnitude[::step, ::step], cmap='viridis', origin='lower')
-            plt.colorbar(im, ax=ax, label='')
-
-        # 流线图（streamplot）
-        if slFlag:
-            ax.streamplot(yy, xx, v, u, color='white', linewidth=0.8, density=1.0)
-
-        # 稀疏箭头图（quiver）
-        ax.quiver(yy[::quiver_step, ::quiver_step],
-                  xx[::quiver_step, ::quiver_step],
-                  v[::quiver_step, ::quiver_step],
-                  -u[::quiver_step, ::quiver_step],
-                  color='red', scale=None)
-
-        ax.set_title("Vector Field Visualization")
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_xlim([-0.1, W+0.1])
-        ax.set_ylim([-0.1, H+0.1])
-        ax.invert_yaxis()
-        plt.tight_layout()
-        
-        return fig
-
-    def generate_flow_field(self):
-        """生成流场箭头图并显示在label6上"""
-        try:
-            # 创建随时间变化的流场
-            size = 64  # 流场大小
-            x = np.linspace(-2, 2, size)
-            y = np.linspace(-2, 2, size)
-            X, Y = np.meshgrid(x, y)
-            
-            # 创建一个随时间变化的涡旋流场
-            # 涡旋中心位置随时间变化
-            center_x = 0.5 * np.sin(self.flow_time)
-            center_y = 0.5 * np.cos(self.flow_time)
-            
-            # 涡旋强度随时间变化
-            strength = 1.0 + 0.3 * np.sin(self.flow_time * 2)
-            
-            # 计算到涡旋中心的距离
-            R = np.sqrt((X - center_x)**2 + (Y - center_y)**2)
-            
-            # 创建涡旋流场
-            theta = np.arctan2(Y - center_y, X - center_x)
-            u = -strength * np.sin(theta) / (R + 0.1)  # 避免除以零
-            v = strength * np.cos(theta) / (R + 0.1)  # 避免除以零
-            
-            # 添加全局流动
-            u += 0.3 * np.sin(self.flow_time * 0.5)
-            v += 0.2 * np.cos(self.flow_time * 0.3)
-            
-            # 添加一些随机扰动
-            u += np.random.randn(size, size) * 0.1
-            v += np.random.randn(size, size) * 0.1
-            
-            # 使用plot_flow_field函数绘制流场图
-            fig = self.plot_flow_field(u, v, 
-                                      magFlag=True, 
-                                      slFlag=True,
-                                      step=1,
-                                      quiver_step=8)
-            
-            # 将图形转换为QPixmap
-            canvas = FigureCanvasAgg(fig)
-            canvas.draw()
-            
-            # 获取图像数据
-            buf = canvas.buffer_rgba()
-            image = np.asarray(buf)
-            
-            # 转换为QImage
-            height, width, channel = image.shape
-            bytes_per_line = 4 * width
-            q_image = QtGui.QImage(image.data, width, height, bytes_per_line, QtGui.QImage.Format_RGBA8888)
-            
-            # 转换为QPixmap并显示
-            pixmap = QtGui.QPixmap.fromImage(q_image)
-            self.ui.label_6.setPixmap(pixmap)
-            
-            # 清理资源
-            plt.close(fig)
-            
-        except Exception as e:
-            print(f"生成流场图错误: {e}")
-            self.ui.statusbar.showMessage(f"生成流场图错误: {e}")
-
-    def update_flow_field(self):
-        """更新流场图 - 随时间变化"""
-        # 更新时间变量
-        self.flow_time += 0.1
-        
-        # 更新流场图
-        self.generate_flow_field()
-        
-        # 在状态栏显示流场更新时间
-        self.ui.statusbar.showMessage(f"流场图更新时间: {self.flow_time:.1f}s")
-
-    def closeEvent(self, event):
-        """窗口关闭时停止摄像头线程"""
-        if self.camera_thread.isRunning():
-            self.camera_thread.stop()
-            
-        if self.flow_timer.isActive():
-            self.flow_timer.stop()
-            
-        # 如果全屏，退出全屏
-        if self.is_fullscreen:
-            self.exit_fullscreen()
-            
-        # 清除画面
-        self.clear_display("应用程序已关闭")
-        self.clear_flow_display("流场图未生成")
-        event.accept()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    
-    # 设置应用程序样式
     app.setStyle("Fusion")
-    
-    # 创建主窗口
     mainWindow = MainWindow()
     mainWindow.setWindowTitle("PIV - 粒子图像测速系统")
     mainWindow.show()
-    
-    # 启动应用程序
     sys.exit(app.exec_())
