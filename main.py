@@ -121,6 +121,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fps = 0.0  # 当前帧率
         self.is_fullscreen = False  # 全屏状态标志
         
+        # 添加全屏窗口变量
+        self.fullscreen_window = None
+        self.fullscreen_label = None
+        self.pre_fullscreen_zoom = 1.0  # 保存进入全屏前的缩放比例
+        
         # 流场动画相关变量
         self.flow_time = 0.0  # 流场时间变量
         self.flow_timer = QTimer(self)  # 用于更新流场的定时器
@@ -141,14 +146,21 @@ class MainWindow(QtWidgets.QMainWindow):
         # 初始禁用相机相关按钮
         self.update_camera_buttons_state(False)
         
-        # 安装事件过滤器用于全屏功能
+        # 安装事件过滤器
         self.ui.label_5.installEventFilter(self)
 
     def eventFilter(self, source, event):
         """事件过滤器，用于检测鼠标双击事件"""
-        if source == self.ui.label_5 and event.type() == QtCore.QEvent.MouseButtonDblClick:
-            self.toggle_fullscreen()
+        # 主窗口标签双击进入全屏
+        if source == self.ui.label_5 and event.type() == QtCore.QEvent.MouseButtonDblClick and not self.is_fullscreen:
+            self.enter_fullscreen()
             return True
+            
+        # 全屏标签双击退出全屏
+        if self.is_fullscreen and source == self.fullscreen_label and event.type() == QtCore.QEvent.MouseButtonDblClick:
+            self.exit_fullscreen()
+            return True
+            
         return super().eventFilter(source, event)
 
     def connect_actions(self):
@@ -229,14 +241,22 @@ class MainWindow(QtWidgets.QMainWindow):
             self.camera_thread.stop()
             # 停止流场更新定时器
             self.flow_timer.stop()
-            # 立即清除画面
+            
+            # 清除画面
             self.clear_display("摄像头已关闭")
             self.clear_flow_display("流场图未生成")
             self.ui.statusbar.showMessage("摄像头已关闭")
+            
+            # 如果全屏，退出全屏
+            if self.is_fullscreen:
+                self.exit_fullscreen()
         else:
             self.ui.statusbar.showMessage("摄像头未打开")
             self.clear_display("摄像头未打开")
             self.clear_flow_display("流场图未生成")
+            
+        # 更新摄像头按钮状态
+        self.update_camera_buttons_state(self.camera_thread.connected)
 
     def update_camera_buttons_state(self, connected):
         """根据摄像头连接状态更新按钮状态"""
@@ -315,12 +335,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 QtCore.Qt.SmoothTransformation
             )
             
-            # 设置label的pixmap
+            # 设置主窗口的label
             self.ui.label_5.setPixmap(scaled_pixmap)
             
-            # 全屏模式下居中显示
-            if self.is_fullscreen:
-                self.ui.label_5.setAlignment(QtCore.Qt.AlignCenter)
+            # 如果全屏窗口存在，更新全屏窗口
+            if self.is_fullscreen and self.fullscreen_label:
+                self.update_fullscreen_display(pixmap)
             
         except Exception as e:
             print(f"图像处理错误: {e}")
@@ -413,29 +433,148 @@ class MainWindow(QtWidgets.QMainWindow):
             self.update_display(self.camera_thread.last_frame)
 
     def toggle_fullscreen(self):
-        """切换全屏模式"""
+        """切换全屏模式 - 由菜单项触发"""
         if self.is_fullscreen:
-            # 退出全屏
-            self.ui.label_5.setWindowFlags(QtCore.Qt.Widget)
-            self.ui.label_5.showNormal()
-            self.show()
-            self.is_fullscreen = False
-            # 退出全屏后恢复缩放因子
-            self.zoom_factor = 1.0
+            self.exit_fullscreen()
         else:
-            # 进入全屏
-            self.ui.label_5.setWindowFlags(
-                QtCore.Qt.Window | 
-                QtCore.Qt.CustomizeWindowHint | 
-                QtCore.Qt.FramelessWindowHint |
-                QtCore.Qt.WindowStaysOnTopHint
-            )
-            self.ui.label_5.showFullScreen()
-            self.is_fullscreen = True
+            self.enter_fullscreen()
+
+    def enter_fullscreen(self):
+        """进入全屏模式"""
+        if self.is_fullscreen:
+            return
             
-            # 进入全屏后立即刷新显示
-            if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
-                self.update_display(self.camera_thread.last_frame)
+        # 保存当前缩放比例
+        self.pre_fullscreen_zoom = self.zoom_factor
+        
+        # 创建全屏窗口和标签
+        self.fullscreen_window = QtWidgets.QWidget()
+        self.fullscreen_window.setWindowFlags(
+            QtCore.Qt.Window | 
+            QtCore.Qt.CustomizeWindowHint | 
+            QtCore.Qt.FramelessWindowHint |
+            QtCore.Qt.WindowStaysOnTopHint
+        )
+        self.fullscreen_window.setStyleSheet("background-color: black;")
+        
+        # 创建全屏布局
+        layout = QtWidgets.QVBoxLayout(self.fullscreen_window)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        # 创建全屏标签
+        self.fullscreen_label = QtWidgets.QLabel()
+        self.fullscreen_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.fullscreen_label.setStyleSheet("background-color: black;")
+        layout.addWidget(self.fullscreen_label)
+        
+        # 设置全屏窗口内容
+        if self.ui.label_5.pixmap() and not self.ui.label_5.pixmap().isNull():
+            self.update_fullscreen_display(self.ui.label_5.pixmap())
+        else:
+            self.fullscreen_label.setText("全屏显示")
+            self.fullscreen_label.setStyleSheet("background-color: black; color: white; font-size: 24px;")
+        
+        # 显示全屏窗口
+        self.fullscreen_window.showFullScreen()
+        self.is_fullscreen = True
+        self.ui.statusbar.showMessage("已进入全屏模式")
+        
+        # 安装事件过滤器
+        self.fullscreen_label.installEventFilter(self)
+
+    def exit_fullscreen(self):
+        """退出全屏模式"""
+        if not self.is_fullscreen:
+            return
+            
+        # 关闭全屏窗口
+        if self.fullscreen_window:
+            self.fullscreen_window.close()
+            self.fullscreen_window.deleteLater()
+            self.fullscreen_window = None
+            self.fullscreen_label = None
+            
+        # 恢复原始状态
+        self.is_fullscreen = False
+        self.zoom_factor = self.pre_fullscreen_zoom
+        
+        # 强制刷新主窗口
+        self.ui.label_5.show()
+        self.ui.centralwidget.update()
+        
+        # 更新状态
+        self.ui.statusbar.showMessage(f"退出全屏，恢复缩放: {self.zoom_factor*100:.0f}%")
+        
+        # 恢复显示
+        if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
+            self.update_display(self.camera_thread.last_frame)
+        else:
+            self.update_camera_display_state()
+    
+    def update_fullscreen_display(self, pixmap):
+        """更新全屏显示"""
+        if not self.is_fullscreen or not self.fullscreen_label:
+            return
+            
+        # 获取屏幕尺寸
+        screen_size = QtWidgets.QApplication.primaryScreen().size()
+        screen_width = screen_size.width()
+        screen_height = screen_size.height()
+        
+        # 计算保持宽高比的缩放比例
+        pixmap_size = pixmap.size()
+        if pixmap_size.width() > 0 and pixmap_size.height() > 0:
+            width_ratio = screen_width / pixmap_size.width()
+            height_ratio = screen_height / pixmap_size.height()
+            scale_ratio = min(width_ratio, height_ratio)
+            
+            # 计算新尺寸
+            new_width = int(pixmap_size.width() * scale_ratio)
+            new_height = int(pixmap_size.height() * scale_ratio)
+            
+            # 避免尺寸为0
+            new_width = max(1, new_width)
+            new_height = max(1, new_height)
+            
+            # 缩放图像
+            scaled_pixmap = pixmap.scaled(
+                new_width, 
+                new_height,
+                QtCore.Qt.KeepAspectRatio,
+                QtCore.Qt.SmoothTransformation
+            )
+            
+            # 设置全屏标签的pixmap
+            self.fullscreen_label.setPixmap(scaled_pixmap)
+
+    def update_camera_display_state(self):
+        """根据摄像头状态更新显示"""
+        if self.camera_thread.connected:
+            if self.camera_thread.opened:
+                self.clear_display("摄像头已关闭")
+            else:
+                self.clear_display("摄像头已连接，请点击'打开相机'")
+        else:
+            self.clear_display("摄像头未连接")
+
+    def force_layout_update(self):
+        """强制更新布局"""
+        self.ui.centralwidget.updateGeometry()
+        self.ui.label_5.updateGeometry()
+        self.update()
+        
+        # 如果摄像头在运行，更新显示
+        if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
+            self.update_display(self.camera_thread.last_frame)
+        else:
+            # 根据当前状态更新显示
+            if self.camera_thread.connected:
+                if self.camera_thread.opened:
+                    self.clear_display("摄像头已关闭")
+                else:
+                    self.clear_display("摄像头已连接，请点击'打开相机'")
+            else:
+                self.clear_display("摄像头未连接")
 
     def first_image(self):
         """导航到第一张图像"""
@@ -625,15 +764,17 @@ class MainWindow(QtWidgets.QMainWindow):
         """窗口关闭时停止摄像头线程"""
         if self.camera_thread.isRunning():
             self.camera_thread.stop()
-            # 清除画面
-            self.clear_display("应用程序已关闭")
-            self.clear_flow_display("流场图未生成")
-        # 停止流场更新定时器
+            
         if self.flow_timer.isActive():
             self.flow_timer.stop()
+            
         # 如果全屏，退出全屏
         if self.is_fullscreen:
-            self.toggle_fullscreen()
+            self.exit_fullscreen()
+            
+        # 清除画面
+        self.clear_display("应用程序已关闭")
+        self.clear_flow_display("流场图未生成")
         event.accept()
 
 if __name__ == "__main__":
