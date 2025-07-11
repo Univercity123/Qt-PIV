@@ -2,12 +2,13 @@ import sys
 import os
 import cv2
 import numpy as np
+import time
 import matplotlib
 matplotlib.use('Agg')  # 使用非交互式后端
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer, QTime
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer
 from Ui_PIV import Ui_MainWindow  # 导入上传文件中的UI类
 
 # 解决 Qt 插件问题
@@ -15,9 +16,10 @@ os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 class CameraThread(QThread):
-    change_pixmap_signal = pyqtSignal(object, float)  # 添加帧率参数
+    change_pixmap_signal = pyqtSignal(object)
     camera_status_signal = pyqtSignal(str)
     connection_status_signal = pyqtSignal(bool)
+    fps_signal = pyqtSignal(float)  # 新增：帧率信号
 
     def __init__(self, camera_index=0):
         super().__init__()
@@ -28,14 +30,11 @@ class CameraThread(QThread):
         self.opened = False
         self.last_frame = None
         self.frame_count = 0
+        self.start_time = 0
         self.fps = 0.0
-        self.fps_timer = QTime()
-        self.fps_timer.start()
 
     def run(self):
         self.running = True
-        self.frame_count = 0
-        self.fps_timer.start()  # 开始计时
         
         # 检查摄像头是否已连接
         if not self.connected:
@@ -52,21 +51,26 @@ class CameraThread(QThread):
             self.opened = True
             self.camera_status_signal.emit("摄像头已打开")
             
+            # 初始化帧率计算
+            self.frame_count = 0
+            self.start_time = time.time()
+            
             while self.running:
                 ret, frame = self.cap.read()
                 if ret:
                     self.last_frame = frame
+                    self.frame_count += 1
                     
                     # 计算帧率
-                    self.frame_count += 1
-                    elapsed = self.fps_timer.elapsed() / 1000.0  # 转换为秒
-                    if elapsed > 0.5:  # 每0.5秒更新一次帧率
-                        self.fps = self.frame_count / elapsed
+                    current_time = time.time()
+                    elapsed_time = current_time - self.start_time
+                    if elapsed_time > 1.0:  # 每秒更新一次帧率
+                        self.fps = self.frame_count / elapsed_time
+                        self.fps_signal.emit(self.fps)
                         self.frame_count = 0
-                        self.fps_timer.restart()
+                        self.start_time = current_time
                     
-                    # 发送帧和帧率
-                    self.change_pixmap_signal.emit(frame, self.fps)
+                    self.change_pixmap_signal.emit(frame)
                 else:
                     break
                     
@@ -114,8 +118,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.camera_thread = CameraThread()
         self.camera_index = 0
         self.zoom_factor = 1.0
+        self.fps = 0.0  # 当前帧率
         self.is_fullscreen = False  # 全屏状态标志
-        self.original_widgets_state = {}  # 保存原始部件状态
         
         # 流场动画相关变量
         self.flow_time = 0.0  # 流场时间变量
@@ -137,9 +141,15 @@ class MainWindow(QtWidgets.QMainWindow):
         # 初始禁用相机相关按钮
         self.update_camera_buttons_state(False)
         
-        # 启用label_5的双击事件
-        self.ui.label_5.setMouseTracking(True)
-        self.ui.label_5.mouseDoubleClickEvent = self.toggle_fullscreen
+        # 安装事件过滤器用于全屏功能
+        self.ui.label_5.installEventFilter(self)
+
+    def eventFilter(self, source, event):
+        """事件过滤器，用于检测鼠标双击事件"""
+        if source == self.ui.label_5 and event.type() == QtCore.QEvent.MouseButtonDblClick:
+            self.toggle_fullscreen()
+            return True
+        return super().eventFilter(source, event)
 
     def connect_actions(self):
         # 摄像头相关操作
@@ -152,6 +162,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionNew_Experiment_9.triggered.connect(self.zoom_out)
         self.ui.actionNew_Experiment_10.triggered.connect(self.zoom_in)
         self.ui.actionNew_Experiment_11.triggered.connect(self.zoom_fit)
+        self.ui.actionNew_Experiment_16.triggered.connect(self.toggle_fullscreen)  # 新增：全屏切换
         
         # 图像导航
         self.ui.actionNew_Experiment_12.triggered.connect(self.first_image)
@@ -171,9 +182,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setup_camera_signals(self):
         # 连接摄像头线程的信号
-        self.camera_thread.change_pixmap_signal.connect(self.update_display)  # 更新为带帧率的信号
+        self.camera_thread.change_pixmap_signal.connect(self.update_display)
         self.camera_thread.camera_status_signal.connect(self.update_status)
         self.camera_thread.connection_status_signal.connect(self.update_camera_buttons_state)
+        self.camera_thread.fps_signal.connect(self.update_fps)  # 连接帧率信号
 
     def link_camera(self):
         """连接摄像头"""
@@ -240,8 +252,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.pushButton_4.setEnabled(connected)  # 打开适配器
         self.ui.pushButton_9.setEnabled(connected)   # 捕获按钮
 
-    def update_display(self, frame, fps):
-        """更新显示画面，并在左上角显示帧率"""
+    def update_display(self, frame):
+        """更新显示画面"""
         if frame is None:
             return
             
@@ -250,13 +262,18 @@ class MainWindow(QtWidgets.QMainWindow):
             return
             
         try:
-            # 在帧上绘制帧率信息 - 使用白色字体
-            fps_text = f"FPS: {fps:.1f}"
-            cv2.putText(frame, fps_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 
-                        0.8, (255, 255, 255), 2, cv2.LINE_AA)  # 白色字体
-            
             # 将BGR图像转换为RGB
             rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            
+            # 在图像左上角添加帧率信息
+            if self.fps > 0:
+                fps_text = f"FPS: {self.fps:.1f}"
+                # 在左上角添加黑色背景的文本
+                cv2.putText(rgb_image, fps_text, (10, 30), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 4, cv2.LINE_AA)
+                # 添加白色文本
+                cv2.putText(rgb_image, fps_text, (10, 30), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
             
             # 获取图像的尺寸
             h, w, ch = rgb_image.shape
@@ -350,13 +367,17 @@ class MainWindow(QtWidgets.QMainWindow):
         if "已连接" in message and not self.camera_thread.opened:
             self.clear_display("摄像头已连接，请点击'打开相机'")
 
+    def update_fps(self, fps):
+        """更新帧率信息"""
+        self.fps = fps
+
     def zoom_out(self):
         """缩小画面"""
         self.zoom_factor = max(0.5, self.zoom_factor * 0.8)
         self.ui.statusbar.showMessage(f"缩放: {self.zoom_factor*100:.0f}%")
         if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
             # 强制刷新当前帧
-            self.update_display(self.camera_thread.last_frame, self.camera_thread.fps)
+            self.update_display(self.camera_thread.last_frame)
 
     def zoom_in(self):
         """放大画面"""
@@ -364,7 +385,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.statusbar.showMessage(f"缩放: {self.zoom_factor*100:.0f}%")
         if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
             # 强制刷新当前帧
-            self.update_display(self.camera_thread.last_frame, self.camera_thread.fps)
+            self.update_display(self.camera_thread.last_frame)
 
     def zoom_fit(self):
         """自适应画面大小"""
@@ -372,7 +393,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.statusbar.showMessage("缩放: 100%")
         if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
             # 强制刷新当前帧
-            self.update_display(self.camera_thread.last_frame, self.camera_thread.fps)
+            self.update_display(self.camera_thread.last_frame)
+
+    def toggle_fullscreen(self):
+        """切换全屏模式"""
+        if self.is_fullscreen:
+            # 退出全屏
+            self.ui.label_5.setWindowFlags(QtCore.Qt.Widget)
+            self.ui.label_5.showNormal()
+            self.show()
+            self.is_fullscreen = False
+        else:
+            # 进入全屏
+            self.ui.label_5.setWindowFlags(
+                QtCore.Qt.Window | 
+                QtCore.Qt.CustomizeWindowHint | 
+                QtCore.Qt.FramelessWindowHint |
+                QtCore.Qt.WindowStaysOnTopHint
+            )
+            self.ui.label_5.showFullScreen()
+            self.is_fullscreen = True
 
     def first_image(self):
         """导航到第一张图像"""
@@ -558,59 +598,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # 在状态栏显示流场更新时间
         self.ui.statusbar.showMessage(f"流场图更新时间: {self.flow_time:.1f}s")
 
-    def toggle_fullscreen(self, event):
-        """切换全屏模式"""
-        if self.is_fullscreen:
-            # 退出全屏
-            self.showNormal()
-            self.menuBar().show()
-            self.statusBar().show()
-            self.ui.toolBar.show()
-            
-            # 恢复所有隐藏的部件
-            for widget, visible in self.original_widgets_state.items():
-                widget.setVisible(visible)
-                
-            self.is_fullscreen = False
-            self.ui.statusbar.showMessage("已退出全屏模式")
-        else:
-            # 保存当前所有可见部件的状态
-            self.original_widgets_state = {}
-            for widget in self.findChildren(QtWidgets.QWidget):
-                if widget != self.ui.label_5:  # 保留视频标签可见
-                    self.original_widgets_state[widget] = widget.isVisible()
-            
-            # 进入全屏
-            self.showFullScreen()
-            self.menuBar().hide()
-            self.statusBar().hide()
-            self.ui.toolBar.hide()
-            
-            # 隐藏除视频标签外的所有部件
-            for widget in self.findChildren(QtWidgets.QWidget):
-                if widget != self.ui.label_5:  # 保留视频标签可见
-                    widget.hide()
-            
-            # 确保视频标签填满整个窗口
-            self.ui.label_5.setGeometry(0, 0, self.width(), self.height())
-            self.ui.label_5.show()
-            
-            self.is_fullscreen = True
-            self.ui.statusbar.showMessage("已进入全屏模式 (ESC退出)")
-            
-    def keyPressEvent(self, event):
-        """键盘事件处理 - 按ESC退出全屏"""
-        if event.key() == QtCore.Qt.Key_Escape and self.is_fullscreen:
-            self.toggle_fullscreen(None)
-        else:
-            super().keyPressEvent(event)
-
-    def resizeEvent(self, event):
-        """窗口大小改变时调整视频标签大小"""
-        if self.is_fullscreen:
-            self.ui.label_5.setGeometry(0, 0, self.width(), self.height())
-        super().resizeEvent(event)
-
     def closeEvent(self, event):
         """窗口关闭时停止摄像头线程"""
         if self.camera_thread.isRunning():
@@ -621,6 +608,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # 停止流场更新定时器
         if self.flow_timer.isActive():
             self.flow_timer.stop()
+        # 如果全屏，退出全屏
+        if self.is_fullscreen:
+            self.toggle_fullscreen()
         event.accept()
 
 if __name__ == "__main__":
