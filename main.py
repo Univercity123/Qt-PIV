@@ -285,16 +285,29 @@ class MainWindow(QtWidgets.QMainWindow):
             # 创建QPixmap
             pixmap = QtGui.QPixmap.fromImage(qt_image)
             
-            # 应用缩放 - 确保使用整数尺寸
-            new_width = int(pixmap.width() * self.zoom_factor)
-            new_height = int(pixmap.height() * self.zoom_factor)
+            # 计算目标尺寸 - 根据全屏状态决定缩放方式
+            if self.is_fullscreen:
+                # 全屏模式：使用屏幕尺寸
+                screen_width = self.ui.label_5.width()
+                screen_height = self.ui.label_5.height()
+                
+                # 计算保持宽高比的缩放比例
+                width_ratio = screen_width / w
+                height_ratio = screen_height / h
+                scale_ratio = min(width_ratio, height_ratio)
+                
+                new_width = int(w * scale_ratio)
+                new_height = int(h * scale_ratio)
+            else:
+                # 非全屏模式：使用缩放因子
+                new_width = int(w * self.zoom_factor)
+                new_height = int(h * self.zoom_factor)
             
             # 避免尺寸为0
-            if new_width <= 0:
-                new_width = 1
-            if new_height <= 0:
-                new_height = 1
-                
+            new_width = max(1, new_width)
+            new_height = max(1, new_height)
+            
+            # 缩放图像
             scaled_pixmap = pixmap.scaled(
                 new_width, 
                 new_height,
@@ -304,6 +317,10 @@ class MainWindow(QtWidgets.QMainWindow):
             
             # 设置label的pixmap
             self.ui.label_5.setPixmap(scaled_pixmap)
+            
+            # 全屏模式下居中显示
+            if self.is_fullscreen:
+                self.ui.label_5.setAlignment(QtCore.Qt.AlignCenter)
             
         except Exception as e:
             print(f"图像处理错误: {e}")
@@ -403,6 +420,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.label_5.showNormal()
             self.show()
             self.is_fullscreen = False
+            # 退出全屏后恢复缩放因子
+            self.zoom_factor = 1.0
         else:
             # 进入全屏
             self.ui.label_5.setWindowFlags(
@@ -413,6 +432,10 @@ class MainWindow(QtWidgets.QMainWindow):
             )
             self.ui.label_5.showFullScreen()
             self.is_fullscreen = True
+            
+            # 进入全屏后立即刷新显示
+            if self.camera_thread.isRunning() and self.camera_thread.last_frame is not None:
+                self.update_display(self.camera_thread.last_frame)
 
     def first_image(self):
         """导航到第一张图像"""
