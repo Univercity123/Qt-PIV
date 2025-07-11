@@ -181,12 +181,12 @@ class FlowVisualizer(QThread):
     """独立的流场可视化线程"""
     visualization_ready = pyqtSignal(object)  # 信号：可视化结果已准备好
     
-    def __init__(self, u, v, width, height):
+    def __init__(self, u, v, max_width=800, max_height=600):
         super().__init__()
         self.u = u
         self.v = v
-        self.width = width
-        self.height = height
+        self.max_width = max_width  # 最大宽度
+        self.max_height = max_height  # 最大高度
         self.mutex = QMutex()
         self.active = True
     
@@ -198,8 +198,24 @@ class FlowVisualizer(QThread):
             # 计算速度大小
             magnitude = np.sqrt(self.u**2 + self.v**2)
             
+            # 计算合适的图形尺寸（保持宽高比）
+            h, w = magnitude.shape
+            aspect_ratio = w / h
+            
+            # 根据最大尺寸计算实际尺寸
+            if w > self.max_width or h > self.max_height:
+                if aspect_ratio > 1:  # 宽大于高
+                    fig_width = self.max_width
+                    fig_height = int(fig_width / aspect_ratio)
+                else:
+                    fig_height = self.max_height
+                    fig_width = int(fig_height * aspect_ratio)
+            else:
+                fig_width = w
+                fig_height = h
+            
             # 创建图像
-            fig = plt.figure(figsize=(self.width/100, self.height/100), dpi=100)
+            fig = plt.figure(figsize=(fig_width/100, fig_height/100), dpi=100)
             ax = fig.add_subplot(111)
             
             # 显示速度大小热力图
@@ -300,6 +316,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置Matplotlib使用英文字体
         plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif']
         plt.rcParams['axes.unicode_minus'] = False
+        
+        # 设置流场标签的尺寸策略（关键修复）
+        self.ui.label_6.setSizePolicy(
+            QtWidgets.QSizePolicy.Preferred,
+            QtWidgets.QSizePolicy.Preferred
+        )
+        self.ui.label_6.setMinimumSize(100, 100)  # 最小尺寸
+        self.ui.label_6.setMaximumSize(1920, 1080)  # 最大尺寸
 
     def eventFilter(self, source, event):
         """事件过滤器，用于检测鼠标双击事件"""
@@ -362,20 +386,17 @@ class MainWindow(QtWidgets.QMainWindow):
             
         self.last_flow_time = current_time
         
+        # 确保之前的线程已完全停止
+        if self.flow_visualizer is not None:
+            self.flow_visualizer.stop()
+            self.flow_visualizer.wait(500)  # 等待线程结束
+            self.flow_visualizer = None
+        
         self.flow_u = u
         self.flow_v = v
         
-        # 停止现有的可视化线程
-        if self.flow_visualizer is not None:
-            self.flow_visualizer.stop()
-            self.flow_visualizer = None
-        
-        # 获取显示区域尺寸
-        label_width = self.ui.label_6.width()
-        label_height = self.ui.label_6.height()
-        
-        # 创建新的可视化线程
-        self.flow_visualizer = FlowVisualizer(u, v, label_width, label_height)
+        # 使用固定最大尺寸创建可视化线程
+        self.flow_visualizer = FlowVisualizer(u, v, max_width=800, max_height=600)
         self.flow_visualizer.visualization_ready.connect(self.update_flow_display)
         self.flow_visualizer.start()
         
@@ -389,13 +410,35 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_flow_display(self, pixmap):
         """更新流场显示（由可视化线程调用）"""
         if pixmap and not pixmap.isNull():
-            # 适当缩放以适合标签
+            # 获取标签的当前尺寸
+            label_width = self.ui.label_6.width()
+            label_height = self.ui.label_6.height()
+            
+            # 计算缩放比例（保持宽高比）
+            pixmap_width = pixmap.width()
+            pixmap_height = pixmap.height()
+            
+            width_ratio = label_width / pixmap_width
+            height_ratio = label_height / pixmap_height
+            scale_ratio = min(width_ratio, height_ratio)
+            
+            # 计算新尺寸
+            new_width = int(pixmap_width * scale_ratio)
+            new_height = int(pixmap_height * scale_ratio)
+            
+            # 避免尺寸为0
+            new_width = max(1, new_width)
+            new_height = max(1, new_height)
+            
+            # 缩放图像
             scaled_pixmap = pixmap.scaled(
-                self.ui.label_6.width(),
-                self.ui.label_6.height(),
+                new_width, 
+                new_height,
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation
             )
+            
+            # 设置标签的pixmap
             self.ui.label_6.setPixmap(scaled_pixmap)
         else:
             self.clear_flow_display("流场数据无效")
