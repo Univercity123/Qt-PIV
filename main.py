@@ -168,12 +168,12 @@ class CameraThread(QThread):
         self.connection_status_signal.emit(False)
         self.camera_status_signal.emit("摄像头已断开")
 
-    def set_camera_settings(self):
+    def set_camera_settings(self):    
         """设置摄像头参数"""
         if not self.connected:
-            self.camera_status_signal.emit("请先连接摄像头")
-            return
-            
+                self.camera_status_signal.emit("请先连接摄像头")
+        return
+             
         # 这里可以添加实际的摄像头设置代码
         self.camera_status_signal.emit("摄像头设置已应用")
 
@@ -181,12 +181,12 @@ class FlowVisualizer(QThread):
     """独立的流场可视化线程"""
     visualization_ready = pyqtSignal(object)  # 信号：可视化结果已准备好
     
-    def __init__(self, u, v, max_width=800, max_height=600):
+    def __init__(self, u, v, target_width, target_height):
         super().__init__()
         self.u = u
         self.v = v
-        self.max_width = max_width  # 最大宽度
-        self.max_height = max_height  # 最大高度
+        self.target_width = target_width  # 目标显示宽度
+        self.target_height = target_height  # 目标显示高度
         self.mutex = QMutex()
         self.active = True
     
@@ -198,40 +198,28 @@ class FlowVisualizer(QThread):
             # 计算速度大小
             magnitude = np.sqrt(self.u**2 + self.v**2)
             
-            # 计算合适的图形尺寸（保持宽高比）
-            h, w = magnitude.shape
-            aspect_ratio = w / h
-            
-            # 根据最大尺寸计算实际尺寸
-            if w > self.max_width or h > self.max_height:
-                if aspect_ratio > 1:  # 宽大于高
-                    fig_width = self.max_width
-                    fig_height = int(fig_width / aspect_ratio)
-                else:
-                    fig_height = self.max_height
-                    fig_width = int(fig_height * aspect_ratio)
-            else:
-                fig_width = w
-                fig_height = h
-            
-            # 创建图像
-            fig = plt.figure(figsize=(fig_width/100, fig_height/100), dpi=100)
+            # 使用目标尺寸创建图形
+            dpi = 100
+            fig_width = self.target_width / dpi
+            fig_height = self.target_height / dpi
+            fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
             ax = fig.add_subplot(111)
             
             # 显示速度大小热力图
-            im = ax.imshow(magnitude, cmap='viridis', origin='upper')
+            im = ax.imshow(magnitude, cmap='viridis', origin='upper', 
+                          extent=[0, self.u.shape[1], 0, self.u.shape[0]])
             plt.colorbar(im, ax=ax, label='Speed')
             
             # 稀疏箭头图
-            step = 16  # 箭头步长
+            step = max(1, int(min(self.u.shape[0], self.u.shape[1]) / 20))  # 动态计算步长
             h, w = magnitude.shape
             quiver_x = np.arange(0, w, step)
             quiver_y = np.arange(0, h, step)
             X, Y = np.meshgrid(quiver_x, quiver_y)
             
             # 获取箭头位置的速度
-            U = self.u[Y, X]
-            V = self.v[Y, X]
+            U = self.u[Y.astype(int), X.astype(int)]
+            V = self.v[Y.astype(int), X.astype(int)]
             
             # 过滤掉非常小的向量
             speed_threshold = 0.1
@@ -277,6 +265,7 @@ class FlowVisualizer(QThread):
     def stop(self):
         self.active = False
         self.wait()
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -325,6 +314,63 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_6.setMinimumSize(100, 100)  # 最小尺寸
         self.ui.label_6.setMaximumSize(1920, 1080)  # 最大尺寸
 
+        # 新增：为摄像头标签设置相同的尺寸策略
+        self.ui.label_5.setSizePolicy(
+            QtWidgets.QSizePolicy.Preferred,
+            QtWidgets.QSizePolicy.Preferred
+        )
+        self.ui.label_5.setMinimumSize(100, 100)  # 最小尺寸
+        self.ui.label_5.setMaximumSize(1920, 1080)  # 最大尺寸
+
+        # 添加以下两行
+        self.last_camera_frame = None  # 保存最后一帧摄像头图像
+        self.last_flow_pixmap = None   # 保存最后一个流场图像
+        
+        # 添加一个标志，防止递归调用
+        self.resizing = False
+
+    def label5_resized(self, event):
+        """label5尺寸变化时触发"""
+        if self.last_camera_frame is not None:
+            self.update_display(self.last_camera_frame)
+        else:
+            self.clear_display("摄像头未连接")
+    
+    def label6_resized(self, event):
+        """label6尺寸变化时触发"""
+        if self.last_flow_pixmap is not None:
+            self.update_flow_display(self.last_flow_pixmap)
+        else:
+            self.clear_flow_display("流场图未生成")
+
+    def resizeEvent(self, event):
+        """窗口大小变化时触发 - 修复无限变大问题"""
+        # 防止递归调用
+        if self.resizing:
+            return
+            
+        self.resizing = True
+        super().resizeEvent(event)
+        
+        # 更新摄像头显示
+        if self.last_camera_frame is not None:
+            # 使用定时器延迟更新，避免连续触发
+            QtCore.QTimer.singleShot(50, lambda: self.update_display(self.last_camera_frame))
+        else:
+            self.clear_display("摄像头未连接")
+        
+        # 更新流场显示
+        if self.last_flow_pixmap is not None:
+            # 使用定时器延迟更新，避免连续触发
+            QtCore.QTimer.singleShot(50, lambda: self.update_flow_display(self.last_flow_pixmap))
+        elif self.flow_u is not None and self.flow_v is not None:
+            # 如果流场数据存在但图像不存在，重新生成流场图
+            self.update_real_flow_field(self.flow_u, self.flow_v)
+        else:
+            self.clear_flow_display("流场图未生成")
+            
+        self.resizing = False
+    
     def eventFilter(self, source, event):
         """事件过滤器，用于检测鼠标双击事件"""
         # 主窗口标签双击进入全屏
@@ -395,8 +441,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.flow_u = u
         self.flow_v = v
         
-        # 使用固定最大尺寸创建可视化线程
-        self.flow_visualizer = FlowVisualizer(u, v, max_width=800, max_height=600)
+        # 获取标签的目标尺寸
+        target_width = max(100, self.ui.label_6.width())
+        target_height = max(100, self.ui.label_6.height())
+        
+        # 使用目标尺寸创建可视化线程
+        self.flow_visualizer = FlowVisualizer(u, v, target_width, target_height)
         self.flow_visualizer.visualization_ready.connect(self.update_flow_display)
         self.flow_visualizer.start()
         
@@ -408,33 +458,24 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.statusbar.showMessage(f"流场更新 | 平均速度: U={avg_u:.2f}, V={avg_v:.2f} | 最大速度: {max_speed:.2f}")
 
     def update_flow_display(self, pixmap):
-        """更新流场显示（由可视化线程调用）"""
+        """更新流场显示 - 拉伸填充模式"""
         if pixmap and not pixmap.isNull():
+            # 保存当前流场图像用于后续调整
+            self.last_flow_pixmap = pixmap
+            
             # 获取标签的当前尺寸
-            label_width = self.ui.label_6.width()
-            label_height = self.ui.label_6.height()
-            
-            # 计算缩放比例（保持宽高比）
-            pixmap_width = pixmap.width()
-            pixmap_height = pixmap.height()
-            
-            width_ratio = label_width / pixmap_width
-            height_ratio = label_height / pixmap_height
-            scale_ratio = min(width_ratio, height_ratio)
-            
-            # 计算新尺寸
-            new_width = int(pixmap_width * scale_ratio)
-            new_height = int(pixmap_height * scale_ratio)
+            label_width = max(1, self.ui.label_6.width())
+            label_height = max(1, self.ui.label_6.height())
             
             # 避免尺寸为0
-            new_width = max(1, new_width)
-            new_height = max(1, new_height)
+            new_width = max(1, label_width)
+            new_height = max(1, label_height)
             
-            # 缩放图像
+            # 缩放图像 - 拉伸填充整个标签
             scaled_pixmap = pixmap.scaled(
                 new_width, 
                 new_height,
-                QtCore.Qt.KeepAspectRatio,
+                QtCore.Qt.IgnoreAspectRatio,  # 忽略宽高比
                 QtCore.Qt.SmoothTransformation
             )
             
@@ -493,10 +534,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.pushButton_9.setEnabled(connected)   # 捕获按钮
 
     def update_display(self, frame):
-        """更新显示画面"""
+        """更新显示画面 - 拉伸填充模式"""
         if frame is None:
             return
             
+        # 保存当前帧用于后续调整
+        self.last_camera_frame = frame
+        
         # 确保接收到的是 numpy 数组
         if not isinstance(frame, np.ndarray):
             return
@@ -525,33 +569,19 @@ class MainWindow(QtWidgets.QMainWindow):
             # 创建QPixmap
             pixmap = QtGui.QPixmap.fromImage(qt_image)
             
-            # 计算目标尺寸 - 根据全屏状态决定缩放方式
-            if self.is_fullscreen:
-                # 全屏模式：使用屏幕尺寸
-                screen_width = self.ui.label_5.width()
-                screen_height = self.ui.label_5.height()
-                
-                # 计算保持宽高比的缩放比例
-                width_ratio = screen_width / w
-                height_ratio = screen_height / h
-                scale_ratio = min(width_ratio, height_ratio)
-                
-                new_width = int(w * scale_ratio)
-                new_height = int(h * scale_ratio)
-            else:
-                # 非全屏模式：使用缩放因子
-                new_width = int(w * self.zoom_factor)
-                new_height = int(h * self.zoom_factor)
+            # 获取标签的当前尺寸
+            label_width = max(1, self.ui.label_5.width())
+            label_height = max(1, self.ui.label_5.height())
             
             # 避免尺寸为0
-            new_width = max(1, new_width)
-            new_height = max(1, new_height)
+            new_width = max(1, label_width)
+            new_height = max(1, label_height)
             
-            # 缩放图像
+            # 缩放图像 - 拉伸填充整个标签
             scaled_pixmap = pixmap.scaled(
                 new_width, 
                 new_height,
-                QtCore.Qt.KeepAspectRatio,
+                QtCore.Qt.IgnoreAspectRatio,  # 忽略宽高比
                 QtCore.Qt.SmoothTransformation
             )
             
@@ -560,26 +590,34 @@ class MainWindow(QtWidgets.QMainWindow):
             
             # 如果全屏窗口存在，更新全屏窗口
             if self.is_fullscreen and self.fullscreen_label:
+                # 全屏模式仍然保持宽高比
                 self.update_fullscreen_display(pixmap)
             
         except Exception as e:
             print(f"图像处理错误: {e}")
             self.ui.statusbar.showMessage(f"图像处理错误: {e}")
 
+
     def clear_display(self, message="摄像头未连接"):
-        """清除显示画面并显示消息"""
+        """清除显示画面并显示消息 - 拉伸填充模式"""
+        # 清除保存的帧
+        self.last_camera_frame = None
+        
         # 获取label的尺寸
         label_width = max(1, self.ui.label_5.width())
         label_height = max(1, self.ui.label_5.height())
         
-        # 创建黑色背景
+        # 创建背景
         background = QtGui.QPixmap(label_width, label_height)
         background.fill(QtGui.QColor(0, 0, 0))  # 黑色背景
         
         # 创建并配置文本
         painter = QtGui.QPainter(background)
         painter.setPen(QtGui.QColor(255, 255, 255))  # 白色文字
-        painter.setFont(QtGui.QFont("Arial", 16))
+        
+        # 根据标签大小动态调整字体
+        font_size = max(10, min(label_height // 15, 24))
+        painter.setFont(QtGui.QFont("Arial", font_size))
         
         # 居中绘制文本
         text_rect = painter.fontMetrics().boundingRect(message)
@@ -592,23 +630,35 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_5.setPixmap(background)
         
     def clear_flow_display(self, message="流场图未生成"):
-        """清除流场显示画面并显示消息（优化版）"""
-        # 创建简单的文本图像，避免复杂的绘制
-        pixmap = QtGui.QPixmap(self.ui.label_6.size())
-        pixmap.fill(QtGui.QColor(0, 0, 0))  # 黑色背景
+        """清除流场显示画面并显示消息 - 拉伸填充模式"""
+        # 清除保存的流场图像
+        self.last_flow_pixmap = None
         
-        painter = QtGui.QPainter(pixmap)
+        # 获取标签的当前尺寸
+        label_width = max(1, self.ui.label_6.width())
+        label_height = max(1, self.ui.label_6.height())
+        
+        # 创建背景
+        background = QtGui.QPixmap(label_width, label_height)
+        background.fill(QtGui.QColor(0, 0, 0))  # 黑色背景
+        
+        # 创建并配置文本
+        painter = QtGui.QPainter(background)
         painter.setPen(QtGui.QColor(255, 255, 255))  # 白色文字
-        painter.setFont(QtGui.QFont("Arial", 14))
+        
+        # 根据标签大小动态调整字体
+        font_size = max(10, min(label_height // 15, 24))
+        painter.setFont(QtGui.QFont("Arial", font_size))
         
         # 居中绘制文本
         text_rect = painter.fontMetrics().boundingRect(message)
-        x = (pixmap.width() - text_rect.width()) // 2
-        y = (pixmap.height() + text_rect.height()) // 2
+        x = (label_width - text_rect.width()) // 2
+        y = (label_height + text_rect.height()) // 2
         painter.drawText(x, y, message)
         painter.end()
         
-        self.ui.label_6.setPixmap(pixmap)
+        # 设置标签的pixmap
+        self.ui.label_6.setPixmap(background)
 
     def update_status(self, message):
         """更新状态信息"""
@@ -799,6 +849,10 @@ class MainWindow(QtWidgets.QMainWindow):
         
         if self.is_fullscreen:
             self.exit_fullscreen()
+
+        # 清除保存的帧
+        self.last_camera_frame = None
+        self.last_flow_pixmap = None
 
     def closeEvent(self, event):
         """窗口关闭时停止所有线程"""
