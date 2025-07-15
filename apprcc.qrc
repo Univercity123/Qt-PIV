@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="PIV">
+    <file>相机设置.png</file>
+    <file>连接相机.png</file>
+    <file>打开相机.png</file>
+    <file>关闭相机.png</file>
+    <file>自适应大小.png</file>
+    <file>24gl-previousCircle.png</file>
+    <file>第一个.png</file>
+    <file>最后一个.png</file>
+    <file>24gl-nextCircle.png</file>
+    <file>放大_zoom-in.png</file>
+    <file>缩小_zoom-out.png</file>
+    <file>文档添加_doc-add.png</file>
+    <file>编辑_editor.png</file>
+  </qresource>
+</RCC>
