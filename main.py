@@ -11,6 +11,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
     mainWindow = MainWindow()
-    mainWindow.setWindowTitle("PIV - 粒子图像系统")
+    mainWindow.setWindowTitle("PIV - 粒子图像测速系统")
     mainWindow.show()
     sys.exit(app.exec_())
