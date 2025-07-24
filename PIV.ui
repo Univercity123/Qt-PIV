@@ -67,21 +67,11 @@
              </property>
              <item>
               <property name="text">
-               <string>原始采集数据</string>
+               <string>数据与设置</string>
               </property>
               <item>
                <property name="text">
-                <string>原始事件数据</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>events.raw</string>
-                </property>
-               </item>
-              </item>
-              <item>
-               <property name="text">
-                <string>实验参数设置</string>
+                <string>采集设置</string>
                </property>
                <item>
                 <property name="text">
@@ -89,14 +79,34 @@
                 </property>
                </item>
               </item>
+              <item>
+               <property name="text">
+                <string>事件数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>events.raw</string>
+                </property>
+               </item>
+              </item>
              </item>
              <item>
               <property name="text">
-               <string>后处理数据</string>
+               <string>测量结果</string>
               </property>
               <item>
                <property name="text">
-                <string>光流场数据</string>
+                <string>算法设置</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>config.txt</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>原始流场结果</string>
                </property>
                <item>
                 <property name="text">
@@ -116,46 +126,56 @@
               </item>
               <item>
                <property name="text">
-                <string>统计结果</string>
+                <string>后处理结果</string>
                </property>
                <item>
                 <property name="text">
-                 <string>statistics_0001.csv</string>
+                 <string>flow_0001.flo</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>statistics_0002.csv</string>
+                 <string>flow_0002.flo</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>statistics_0003.csv</string>
+                 <string>flow_0003.flo</string>
                 </property>
                </item>
               </item>
              </item>
              <item>
               <property name="text">
-               <string>可视化结果</string>
+               <string>可视化展示</string>
               </property>
               <item>
                <property name="text">
-                <string>采集的图像帧</string>
+                <string>显示设置</string>
                </property>
                <item>
                 <property name="text">
-                 <string>frame_0001.png</string>
+                 <string>plot.txt</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>事件体素网格</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>grid_0001.png</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>frame_0002.png</string>
+                 <string>grid_0002.png</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>frame_0003.png</string>
+                 <string>grid_0003.png</string>
                 </property>
                </item>
               </item>
@@ -176,26 +196,6 @@
                <item>
                 <property name="text">
                  <string>flow_0003.png</string>
-                </property>
-               </item>
-              </item>
-              <item>
-               <property name="text">
-                <string>整体可视化图</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>combined_0001.png</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>combined_0002.png</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>combined_0003.png</string>
                 </property>
                </item>
               </item>
@@ -217,21 +217,11 @@
              </property>
              <item>
               <property name="text">
-               <string>原始采集数据</string>
+               <string>数据与设置</string>
               </property>
               <item>
                <property name="text">
-                <string>原始事件数据</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>events.raw</string>
-                </property>
-               </item>
-              </item>
-              <item>
-               <property name="text">
-                <string>实验参数设置</string>
+                <string>采集设置</string>
                </property>
                <item>
                 <property name="text">
@@ -239,14 +229,34 @@
                 </property>
                </item>
               </item>
+              <item>
+               <property name="text">
+                <string>事件数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>events.raw</string>
+                </property>
+               </item>
+              </item>
              </item>
              <item>
               <property name="text">
-               <string>后处理数据</string>
+               <string>测量结果</string>
               </property>
               <item>
                <property name="text">
-                <string>光流场数据</string>
+                <string>算法设置</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>config.txt</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>原始流场结果</string>
                </property>
                <item>
                 <property name="text">
@@ -266,46 +276,56 @@
               </item>
               <item>
                <property name="text">
-                <string>统计结果</string>
+                <string>后处理结果</string>
                </property>
                <item>
                 <property name="text">
-                 <string>statistics_0001.csv</string>
+                 <string>flow_0001.flo</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>statistics_0002.csv</string>
+                 <string>flow_0002.flo</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>statistics_0003.csv</string>
+                 <string>flow_0003.flo</string>
                 </property>
                </item>
               </item>
              </item>
              <item>
               <property name="text">
-               <string>可视化结果</string>
+               <string>可视化展示</string>
               </property>
               <item>
                <property name="text">
-                <string>采集的图像帧</string>
+                <string>显示设置</string>
                </property>
                <item>
                 <property name="text">
-                 <string>frame_0001.png</string>
+                 <string>plot.txt</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>事件体素网格</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>grid_0001.png</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>frame_0002.png</string>
+                 <string>grid_0002.png</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>frame_0003.png</string>
+                 <string>grid_0003.png</string>
                 </property>
                </item>
               </item>
@@ -326,26 +346,6 @@
                <item>
                 <property name="text">
                  <string>flow_0003.png</string>
-                </property>
-               </item>
-              </item>
-              <item>
-               <property name="text">
-                <string>整体可视化图</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>combined_0001.png</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>combined_0002.png</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>combined_0003.png</string>
                 </property>
                </item>
               </item>
@@ -367,21 +367,11 @@
              </property>
              <item>
               <property name="text">
-               <string>原始采集数据</string>
+               <string>数据与设置</string>
               </property>
               <item>
                <property name="text">
-                <string>原始事件数据</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>events.raw</string>
-                </property>
-               </item>
-              </item>
-              <item>
-               <property name="text">
-                <string>实验参数设置</string>
+                <string>采集设置</string>
                </property>
                <item>
                 <property name="text">
@@ -389,14 +379,34 @@
                 </property>
                </item>
               </item>
+              <item>
+               <property name="text">
+                <string>事件数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>events.raw</string>
+                </property>
+               </item>
+              </item>
              </item>
              <item>
               <property name="text">
-               <string>后处理数据</string>
+               <string>测量结果</string>
               </property>
               <item>
                <property name="text">
-                <string>光流场数据</string>
+                <string>算法设置</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>config.txt</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>原始流场结果</string>
                </property>
                <item>
                 <property name="text">
@@ -416,46 +426,56 @@
               </item>
               <item>
                <property name="text">
-                <string>统计结果</string>
+                <string>后处理结果</string>
                </property>
                <item>
                 <property name="text">
-                 <string>statistics_0001.csv</string>
+                 <string>flow_0001.flo</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>statistics_0002.csv</string>
+                 <string>flow_0002.flo</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>statistics_0003.csv</string>
+                 <string>flow_0003.flo</string>
                 </property>
                </item>
               </item>
              </item>
              <item>
               <property name="text">
-               <string>可视化结果</string>
+               <string>可视化展示</string>
               </property>
               <item>
                <property name="text">
-                <string>采集的图像帧</string>
+                <string>显示设置</string>
                </property>
                <item>
                 <property name="text">
-                 <string>frame_0001.png</string>
+                 <string>plot.txt</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>事件体素网格</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>grid_0001.png</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>frame_0002.png</string>
+                 <string>grid_0002.png</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>frame_0003.png</string>
+                 <string>grid_0003.png</string>
                 </property>
                </item>
               </item>
@@ -476,26 +496,6 @@
                <item>
                 <property name="text">
                  <string>flow_0003.png</string>
-                </property>
-               </item>
-              </item>
-              <item>
-               <property name="text">
-                <string>整体可视化图</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>combined_0001.png</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>combined_0002.png</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>combined_0003.png</string>
                 </property>
                </item>
               </item>
