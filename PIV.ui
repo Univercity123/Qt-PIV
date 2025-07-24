@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1117</width>
-    <height>819</height>
+    <width>1157</width>
+    <height>842</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,333 +20,1463 @@
    <enum>Qt::ToolButtonTextBesideIcon</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QComboBox" name="comboBox_7">
-    <property name="geometry">
-     <rect>
-      <x>477</x>
-      <y>1067</y>
-      <width>86</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>1011</width>
-      <height>581</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
-     <item>
-      <widget class="QTabWidget" name="tabWidget_2">
-       <property name="tabPosition">
-        <enum>QTabWidget::South</enum>
-       </property>
-       <property name="currentIndex">
-        <number>1</number>
-       </property>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>Exp Tree</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_5">
-        <attribute name="title">
-         <string>Capture</string>
-        </attribute>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>321</width>
-           <height>165</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="text">
-             <string>Search Adapters</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QTextBrowser" name="textBrowser_2"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Exposure</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="comboBox_6"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="text">
-             <string>Open Adapter</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Capture</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_4"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="comboBox_5"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>130</y>
-           <width>321</width>
-           <height>61</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Timing Setup...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="text">
-             <string>Power Setup...</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>190</y>
-           <width>321</width>
-           <height>121</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Laser A</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_2"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Laser B</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="comboBox"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="pushButton_7">
-            <property name="text">
-             <string>Laser On</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="pushButton_8">
-            <property name="text">
-             <string>Laser Off</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>Save Images</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="pushButton_9">
-            <property name="text">
-             <string>Capture</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QPushButton" name="pushButton_10">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>310</y>
-           <width>321</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Grab Stop</string>
-         </property>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>340</y>
-           <width>321</width>
-           <height>71</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Save Setups</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_11"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="pushButton_11">
-            <property name="text">
-             <string>Del</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButton_12">
-            <property name="text">
-             <string>Save</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="tab_6">
-        <attribute name="title">
-         <string>Process</string>
-        </attribute>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTabWidget" name="tabWidget">
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="currentIndex">
-        <number>1</number>
-       </property>
-       <widget class="QWidget" name="tab">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_14">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <widget class="QTabWidget" name="tabWidget_2">
+        <property name="minimumSize">
+         <size>
+          <width>381</width>
+          <height>481</height>
+         </size>
         </property>
-        <attribute name="title">
-         <string>Frame A</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_2">
-        <attribute name="title">
-         <string>Frame B</string>
-        </attribute>
-        <widget class="QLabel" name="label_6">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>631</width>
-           <height>511</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(0, 0, 0);</string>
-         </property>
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
+        <property name="maximumSize">
+         <size>
+          <width>381</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::South</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>项目结构</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_7">
+          <item row="0" column="1">
+           <widget class="QTreeWidget" name="treeWidget">
+            <column>
+             <property name="text">
+              <string>实验结果</string>
+             </property>
+            </column>
+            <item>
+             <property name="text">
+              <string>case 1</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>原始采集数据</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>原始事件数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>events.raw</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>实验参数设置</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>settings.txt</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>后处理数据</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>光流场数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>flow_0001.npz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0002.npz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0003.npz</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>统计结果</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>statistics_0001.csv</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>statistics_0002.csv</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>statistics_0003.csv</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>可视化结果</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>采集的图像帧</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>frame_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>frame_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>frame_0003.png</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>流场可视化图</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>flow_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0003.png</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>整体可视化图</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>combined_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>combined_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>combined_0003.png</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>实验日志</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>experiment_log.txt</string>
+               </property>
+              </item>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>case 2</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>原始采集数据</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>原始事件数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>events.raw</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>实验参数设置</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>settings.txt</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>后处理数据</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>光流场数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>flow_0001.npz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0002.npz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0003.npz</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>统计结果</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>statistics_0001.csv</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>statistics_0002.csv</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>statistics_0003.csv</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>可视化结果</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>采集的图像帧</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>frame_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>frame_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>frame_0003.png</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>流场可视化图</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>flow_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0003.png</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>整体可视化图</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>combined_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>combined_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>combined_0003.png</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>实验日志</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>experiment_log.txt</string>
+               </property>
+              </item>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>csae 3</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>原始采集数据</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>原始事件数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>events.raw</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>实验参数设置</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>settings.txt</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>后处理数据</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>光流场数据</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>flow_0001.npz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0002.npz</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0003.npz</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>统计结果</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>statistics_0001.csv</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>statistics_0002.csv</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>statistics_0003.csv</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>可视化结果</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>采集的图像帧</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>frame_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>frame_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>frame_0003.png</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>流场可视化图</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>flow_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>flow_0003.png</string>
+                </property>
+               </item>
+              </item>
+              <item>
+               <property name="text">
+                <string>整体可视化图</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>combined_0001.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>combined_0002.png</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>combined_0003.png</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>实验日志</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>experiment_log.txt</string>
+               </property>
+              </item>
+             </item>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_5">
+         <attribute name="title">
+          <string>拍摄画面</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QPushButton" name="pushButton_3">
+                  <property name="text">
+                   <string>搜索设备</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_4">
+                  <item>
+                   <property name="text">
+                    <string>事件相机1</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>事件相机2</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QPushButton" name="pushButton_4">
+                  <property name="maximumSize">
+                   <size>
+                    <width>204</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>打开设备</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>52</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QTextBrowser" name="textBrowser_2">
+                  <property name="maximumSize">
+                   <size>
+                    <width>175</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="html">
+                   <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;已打开&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>连接状态</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_5">
+                  <item>
+                   <property name="text">
+                    <string>已连接</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>相机</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_6">
+                  <item>
+                   <property name="text">
+                    <string>P51307</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>定时设置</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>电源设置</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>激光 A</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_2">
+                  <item>
+                   <property name="text">
+                    <string>已打开</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>激光 B</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox">
+                  <item>
+                   <property name="text">
+                    <string>已关闭</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QPushButton" name="pushButton_7">
+                  <property name="text">
+                   <string>打开激光</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_8">
+                  <property name="text">
+                   <string>关闭激光</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QCheckBox" name="checkBox">
+                  <property name="text">
+                   <string>保存图像</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_9">
+                  <property name="text">
+                   <string>拍照</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_10">
+                <property name="text">
+                 <string>紧急关闭</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <item>
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>保存设置</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_11">
+                  <item>
+                   <property name="text">
+                    <string>/output/case5</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QPushButton" name="pushButton_11">
+                  <property name="text">
+                   <string>删除</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_12">
+                  <property name="text">
+                   <string>保存</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_6">
+         <attribute name="title">
+          <string>算法设置</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_15">
+                <item>
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>光流算法</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_7">
+                  <item>
+                   <property name="text">
+                    <string>平面拟和(PlaneFitting)</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>时间梯度(TimeGradient)</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>三元匹配(TripletMatching)</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QStackedWidget" name="stackedWidget">
+                <property name="currentIndex">
+                 <number>2</number>
+                </property>
+                <widget class="QWidget" name="page_3">
+                 <layout class="QFormLayout" name="formLayout">
+                  <item row="0" column="1">
+                   <layout class="QVBoxLayout" name="verticalLayout_3">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_16">
+                      <item>
+                       <widget class="QLabel" name="label_9">
+                        <property name="text">
+                         <string>感受野半径</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_2">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox">
+                        <property name="minimumSize">
+                         <size>
+                          <width>44</width>
+                          <height>26</height>
+                         </size>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_17">
+                      <item>
+                       <widget class="QLabel" name="label_12">
+                        <property name="text">
+                         <string>阈值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_3">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_2"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_18">
+                      <item>
+                       <widget class="QLabel" name="label_13">
+                        <property name="text">
+                         <string>最大光流幅值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_4">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_3"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_19">
+                      <item>
+                       <widget class="QLabel" name="label_14">
+                        <property name="text">
+                         <string>最小光流幅值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_5">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_4"/>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_5">
+                 <layout class="QFormLayout" name="formLayout_2">
+                  <item row="0" column="1">
+                   <layout class="QVBoxLayout" name="verticalLayout_4">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_20">
+                      <item>
+                       <widget class="QLabel" name="label_10">
+                        <property name="text">
+                         <string>感受野半径</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_6">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_5"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_21">
+                      <item>
+                       <widget class="QLabel" name="label_15">
+                        <property name="text">
+                         <string>时间梯度阈值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_7">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_6"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_22">
+                      <item>
+                       <widget class="QLabel" name="label_16">
+                        <property name="text">
+                         <string>最大流速幅值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_8">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_7"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_23">
+                      <item>
+                       <widget class="QLabel" name="label_17">
+                        <property name="text">
+                         <string>最小流速幅值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_9">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_8"/>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_4">
+                 <layout class="QFormLayout" name="formLayout_4">
+                  <item row="0" column="1">
+                   <layout class="QVBoxLayout" name="verticalLayout_5">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_24">
+                      <item>
+                       <widget class="QLabel" name="label_11">
+                        <property name="text">
+                         <string>感受野半径</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_10">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_9"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_25">
+                      <item>
+                       <widget class="QLabel" name="label_18">
+                        <property name="text">
+                         <string>三元组数量</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_11">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_10"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_26">
+                      <item>
+                       <widget class="QLabel" name="label_19">
+                        <property name="text">
+                         <string>最大迭代次数</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_13">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_11"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_27">
+                      <item>
+                       <widget class="QLabel" name="label_20">
+                        <property name="text">
+                         <string>距离阈值</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_12">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QSpinBox" name="spinBox_12"/>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>可视化速度场：</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout_5">
+               <item row="0" column="1">
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_28">
+                   <item>
+                    <widget class="QLabel" name="label_21">
+                     <property name="text">
+                      <string>速度热力图</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_14">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBox_3">
+                     <item>
+                      <property name="text">
+                       <string>True</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>False</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_29">
+                   <item>
+                    <widget class="QLabel" name="label_22">
+                     <property name="text">
+                      <string>速度流线图</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_15">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBox_8">
+                     <item>
+                      <property name="text">
+                       <string>True</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>False</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_30">
+                   <item>
+                    <widget class="QLabel" name="label_23">
+                     <property name="text">
+                      <string>背景图采样间隔</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_16">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="spinBox_13"/>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_31">
+                   <item>
+                    <widget class="QLabel" name="label_24">
+                     <property name="text">
+                      <string>稀疏箭头图采样间隔</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_17">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="spinBox_14"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_3">
-        <attribute name="title">
-         <string>Diplay</string>
-        </attribute>
-        <widget class="QLabel" name="label_5">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>10</y>
-           <width>641</width>
-           <height>521</height>
-          </rect>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="widget">
+         <property name="enabled">
+          <bool>true</bool>
          </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(0, 0, 0);</string>
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
          </property>
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
+         <attribute name="title">
+          <string>事件体素图像</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>实时流场结果</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1117</width>
+     <width>1157</width>
      <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuExperiment_Run">
     <property name="title">
-     <string>Experiment/Run</string>
+     <string>实验</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuCapture">
     <property name="title">
-     <string>Capture</string>
+     <string>相机</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>工具</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
-     <string>Window</string>
+     <string>窗口</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>帮助</string>
     </property>
    </widget>
    <addaction name="menuExperiment_Run"/>
@@ -412,16 +1542,18 @@
    </attribute>
    <addaction name="actionNew_Experiment_12"/>
    <addaction name="actionNew_Experiment_13"/>
-   <addaction name="actionNew_Experiment_14"/>
    <addaction name="actionNew_Experiment_15"/>
+   <addaction name="actionNew_Experiment_14"/>
+   <addaction name="action"/>
+   <addaction name="action_2"/>
   </widget>
   <action name="actionNew_Experiment">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/文档添加_doc-add.png</normaloff>:/PIV/文档添加_doc-add.png</iconset>
    </property>
    <property name="text">
-    <string>New Experiment</string>
+    <string>新建实验</string>
    </property>
    <property name="toolTip">
     <string>New Experiment</string>
@@ -429,11 +1561,11 @@
   </action>
   <action name="actionNew_Experiment_2">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/编辑_editor.png</normaloff>:/PIV/编辑_editor.png</iconset>
    </property>
    <property name="text">
-    <string>Edit Experiment</string>
+    <string>编辑实验</string>
    </property>
    <property name="toolTip">
     <string>Edit Experiment</string>
@@ -441,7 +1573,7 @@
   </action>
   <action name="actionNew_Experiment_3">
    <property name="text">
-    <string>New Run</string>
+    <string>新建进程</string>
    </property>
    <property name="toolTip">
     <string>New Run</string>
@@ -449,7 +1581,7 @@
   </action>
   <action name="actionNew_Experiment_4">
    <property name="text">
-    <string>Edit Run</string>
+    <string>编辑进程</string>
    </property>
    <property name="toolTip">
     <string>Edit Run</string>
@@ -457,11 +1589,11 @@
   </action>
   <action name="actionNew_Experiment_5">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/连接相机.png</normaloff>:/PIV/连接相机.png</iconset>
    </property>
    <property name="text">
-    <string>Link Camera</string>
+    <string>连接相机</string>
    </property>
    <property name="toolTip">
     <string>Link Camera</string>
@@ -469,11 +1601,11 @@
   </action>
   <action name="actionNew_Experiment_6">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/打开相机.png</normaloff>:/PIV/打开相机.png</iconset>
    </property>
    <property name="text">
-    <string>Open Camera</string>
+    <string>打开相机</string>
    </property>
    <property name="toolTip">
     <string>Open Camera</string>
@@ -481,11 +1613,11 @@
   </action>
   <action name="actionNew_Experiment_7">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/相机设置.png</normaloff>:/PIV/相机设置.png</iconset>
    </property>
    <property name="text">
-    <string>Set Camera</string>
+    <string>设置相机</string>
    </property>
    <property name="toolTip">
     <string>Set Camera</string>
@@ -493,11 +1625,11 @@
   </action>
   <action name="actionNew_Experiment_8">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/关闭相机.png</normaloff>:/PIV/关闭相机.png</iconset>
    </property>
    <property name="text">
-    <string>Close Camera</string>
+    <string>关闭相机</string>
    </property>
    <property name="toolTip">
     <string>Close Camera</string>
@@ -505,11 +1637,11 @@
   </action>
   <action name="actionNew_Experiment_9">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/放大_zoom-in.png</normaloff>:/PIV/放大_zoom-in.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom Out</string>
+    <string>放大</string>
    </property>
    <property name="toolTip">
     <string>Zoom Out</string>
@@ -517,11 +1649,11 @@
   </action>
   <action name="actionNew_Experiment_10">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/缩小_zoom-out.png</normaloff>:/PIV/缩小_zoom-out.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom In</string>
+    <string>缩小</string>
    </property>
    <property name="toolTip">
     <string>Zoom In</string>
@@ -529,11 +1661,11 @@
   </action>
   <action name="actionNew_Experiment_11">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/自适应大小.png</normaloff>:/PIV/自适应大小.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom Fit</string>
+    <string>自适应大小</string>
    </property>
    <property name="toolTip">
     <string>Zoom Fit</string>
@@ -541,11 +1673,11 @@
   </action>
   <action name="actionNew_Experiment_12">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/第一个.png</normaloff>:/PIV/第一个.png</iconset>
    </property>
    <property name="text">
-    <string>First Image</string>
+    <string>第一体素网格</string>
    </property>
    <property name="toolTip">
     <string>First Image</string>
@@ -553,11 +1685,11 @@
   </action>
   <action name="actionNew_Experiment_13">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/24gl-previousCircle.png</normaloff>:/PIV/24gl-previousCircle.png</iconset>
    </property>
    <property name="text">
-    <string>Last Image</string>
+    <string>最后体素网格</string>
    </property>
    <property name="toolTip">
     <string>Last Image</string>
@@ -565,11 +1697,11 @@
   </action>
   <action name="actionNew_Experiment_14">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/24gl-nextCircle.png</normaloff>:/PIV/24gl-nextCircle.png</iconset>
    </property>
    <property name="text">
-    <string>Next Image</string>
+    <string>下一体素网格</string>
    </property>
    <property name="toolTip">
     <string>Next Image</string>
@@ -577,11 +1709,11 @@
   </action>
   <action name="actionNew_Experiment_15">
    <property name="icon">
-    <iconset resource="apprcc.qrc">
+    <iconset>
      <normaloff>:/PIV/最后一个.png</normaloff>:/PIV/最后一个.png</iconset>
    </property>
    <property name="text">
-    <string>End Image</string>
+    <string>上一体素网格</string>
    </property>
    <property name="toolTip">
     <string>End Image</string>
@@ -595,9 +1727,36 @@
     <string>New Experiment</string>
    </property>
   </action>
+  <action name="action">
+   <property name="text">
+    <string>开始保存</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>结束保存</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="apprcc.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>comboBox_7</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>237</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>226</x>
+     <y>278</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

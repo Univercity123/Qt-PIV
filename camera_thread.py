@@ -164,3 +164,8 @@ class CameraThread(QThread):
              
         # 这里可以添加实际的摄像头设置代码
         self.camera_status_signal.emit("摄像头设置已应用")
+
+    # 添加一个方法以兼容事件相机设置
+    def set_accumulation_time(self, time_ms):
+        """兼容方法，普通摄像头不支持此设置"""
+        pass

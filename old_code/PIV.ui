@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1157</width>
+    <height>842</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PIV</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextBesideIcon</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_14">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <widget class="QTabWidget" name="tabWidget_2">
+        <property name="minimumSize">
+         <size>
+          <width>381</width>
+          <height>481</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>381</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::South</enum>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Exp Tree</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tab_5">
+         <attribute name="title">
+          <string>Capture</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QPushButton" name="pushButton_3">
+                  <property name="text">
+                   <string>Search Adapters</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_4"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QPushButton" name="pushButton_4">
+                  <property name="maximumSize">
+                   <size>
+                    <width>204</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Open Adapter</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>52</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QTextBrowser" name="textBrowser_2">
+                  <property name="maximumSize">
+                   <size>
+                    <width>175</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Exposure</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_5"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Capture</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_6"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>Timing Setup...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Power Setup...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Laser A</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_2"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Laser B</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QPushButton" name="pushButton_7">
+                  <property name="text">
+                   <string>Laser On</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_8">
+                  <property name="text">
+                   <string>Laser Off</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QCheckBox" name="checkBox">
+                  <property name="text">
+                   <string>Save Images</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_9">
+                  <property name="text">
+                   <string>Capture</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_10">
+                <property name="text">
+                 <string>Grab Stop</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <item>
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Save Setups</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox_11"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QPushButton" name="pushButton_11">
+                  <property name="text">
+                   <string>Del</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_12">
+                  <property name="text">
+                   <string>Save</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_6">
+         <attribute name="title">
+          <string>Process</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="widget">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
+         <attribute name="title">
+          <string>Frame A</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Frame B</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1157</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuExperiment_Run">
+    <property name="title">
+     <string>Experiment/Run</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuCapture">
+    <property name="title">
+     <string>Capture</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <addaction name="menuExperiment_Run"/>
+   <addaction name="menuCapture"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuWindow"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew_Experiment"/>
+   <addaction name="actionNew_Experiment_2"/>
+   <addaction name="actionNew_Experiment_3"/>
+   <addaction name="actionNew_Experiment_4"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew_Experiment_5"/>
+   <addaction name="actionNew_Experiment_6"/>
+   <addaction name="actionNew_Experiment_7"/>
+   <addaction name="actionNew_Experiment_8"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_3">
+   <property name="windowTitle">
+    <string>toolBar_3</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionNew_Experiment_9"/>
+   <addaction name="actionNew_Experiment_10"/>
+   <addaction name="actionNew_Experiment_11"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_4">
+   <property name="windowTitle">
+    <string>toolBar_4</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew_Experiment_12"/>
+   <addaction name="actionNew_Experiment_13"/>
+   <addaction name="actionNew_Experiment_14"/>
+   <addaction name="actionNew_Experiment_15"/>
+  </widget>
+  <action name="actionNew_Experiment">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/文档添加_doc-add.png</normaloff>:/PIV/文档添加_doc-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Experiment</string>
+   </property>
+   <property name="toolTip">
+    <string>New Experiment</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_2">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/编辑_editor.png</normaloff>:/PIV/编辑_editor.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Experiment</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Experiment</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_3">
+   <property name="text">
+    <string>New Run</string>
+   </property>
+   <property name="toolTip">
+    <string>New Run</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_4">
+   <property name="text">
+    <string>Edit Run</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Run</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_5">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/连接相机.png</normaloff>:/PIV/连接相机.png</iconset>
+   </property>
+   <property name="text">
+    <string>连接摄像头</string>
+   </property>
+   <property name="toolTip">
+    <string>Link Camera</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_6">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/打开相机.png</normaloff>:/PIV/打开相机.png</iconset>
+   </property>
+   <property name="text">
+    <string>打开摄像头</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Camera</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_7">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/相机设置.png</normaloff>:/PIV/相机设置.png</iconset>
+   </property>
+   <property name="text">
+    <string>设置摄像头</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Camera</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_8">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/关闭相机.png</normaloff>:/PIV/关闭相机.png</iconset>
+   </property>
+   <property name="text">
+    <string>关闭摄像头</string>
+   </property>
+   <property name="toolTip">
+    <string>Close Camera</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_9">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/放大_zoom-in.png</normaloff>:/PIV/放大_zoom-in.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_10">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/缩小_zoom-out.png</normaloff>:/PIV/缩小_zoom-out.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_11">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/自适应大小.png</normaloff>:/PIV/自适应大小.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom Fit</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Fit</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_12">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/第一个.png</normaloff>:/PIV/第一个.png</iconset>
+   </property>
+   <property name="text">
+    <string>First Image</string>
+   </property>
+   <property name="toolTip">
+    <string>First Image</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_13">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/24gl-previousCircle.png</normaloff>:/PIV/24gl-previousCircle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Last Image</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_14">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/24gl-nextCircle.png</normaloff>:/PIV/24gl-nextCircle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Next Image</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_15">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/PIV/最后一个.png</normaloff>:/PIV/最后一个.png</iconset>
+   </property>
+   <property name="text">
+    <string>End Image</string>
+   </property>
+   <property name="toolTip">
+    <string>End Image</string>
+   </property>
+  </action>
+  <action name="actionNew_Experiment_16">
+   <property name="text">
+    <string>New Experiment</string>
+   </property>
+   <property name="toolTip">
+    <string>New Experiment</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="apprcc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

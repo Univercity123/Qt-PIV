@@ -1,14 +1,16 @@
-import sys
-import os
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer, QMutex, QMutexLocker
+from event_camera_thread import EventCameraThread
+from flow_visualizer import FlowVisualizer
+from Ui_PIV import Ui_MainWindow
 import cv2
+import os
+import sys
 import numpy as np
 import time
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSlot, QMutexLocker, QTimer, QMutex
-from Ui_PIV import Ui_MainWindow
-from camera_thread import CameraThread
-from flow_visualizer import FlowVisualizer
-import matplotlib as plt
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -16,8 +18,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
-        # 初始化摄像头线程
-        self.camera_thread = CameraThread()
+        # 初始化事件相机线程
+        self.camera_thread = EventCameraThread(
+            input_event_file=None,  # 可以传入事件文件路径
+            camera_serial=None,    # 可以传入相机序列号
+            slicing_mode='N_US',   # 切片模式
+            delta_ts=10000,        # 切片时间（微秒）
+            delta_n_events=10000   # 切片事件数
+        )
+        
         self.camera_index = 0
         self.zoom_factor = 1.0
         self.fps = 0.0
@@ -26,18 +35,16 @@ class MainWindow(QtWidgets.QMainWindow):
         # 流场相关变量
         self.flow_u = None
         self.flow_v = None
-        self.flow_visualizer = None  # 流场可视化线程
-        
-        # 性能优化
+        self.flow_visualizer = None
         self.last_flow_time = 0
-        self.flow_min_interval = 0.3  # 流场更新最小间隔（秒）
+        self.flow_min_interval = 0.3
         
         # 连接信号和槽
-        self.connect_actions()
         self.setup_camera_signals()
+        self.connect_actions()
         
         # 初始化显示
-        self.clear_display("摄像头未连接")
+        self.clear_display("事件相机未连接")
         self.clear_flow_display("流场图未生成")
         
         # 设置初始状态
@@ -49,28 +56,101 @@ class MainWindow(QtWidgets.QMainWindow):
         plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif']
         plt.rcParams['axes.unicode_minus'] = False
         
-        # 设置流场标签的尺寸策略（关键修复）
+        # 设置流场标签的尺寸策略
         self.ui.label_6.setSizePolicy(
             QtWidgets.QSizePolicy.Preferred,
             QtWidgets.QSizePolicy.Preferred
         )
-        self.ui.label_6.setMinimumSize(100, 100)  # 最小尺寸
-        self.ui.label_6.setMaximumSize(1920, 1080)  # 最大尺寸
-
-        # 新增：为摄像头标签设置相同的尺寸策略
+        self.ui.label_6.setMinimumSize(100, 100)
+        self.ui.label_6.setMaximumSize(1920, 1080)
+        
+        # 设置摄像头标签的尺寸策略
         self.ui.label_5.setSizePolicy(
             QtWidgets.QSizePolicy.Preferred,
             QtWidgets.QSizePolicy.Preferred
         )
-        self.ui.label_5.setMinimumSize(100, 100)  # 最小尺寸
-        self.ui.label_5.setMaximumSize(1920, 1080)  # 最大尺寸
+        self.ui.label_5.setMinimumSize(100, 100)
+        self.ui.label_5.setMaximumSize(1920, 1080)
 
-        # 添加以下两行
-        self.last_camera_frame = None  # 保存最后一帧摄像头图像
-        self.last_flow_pixmap = None   # 保存最后一个流场图像
-        
-        # 添加一个标志，防止递归调用
+        # 保存最后一帧
+        self.last_camera_frame = None
+        self.last_flow_pixmap = None
         self.resizing = False
+
+
+    def fix_qt_plugin_issues(self):
+        """修复Qt平台插件加载问题"""
+        # 清除可能冲突的环境变量
+        if "QT_QPA_PLATFORM_PLUGIN_PATH" in os.environ:
+            del os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"]
+        
+        # 设置正确的平台插件
+        os.environ["QT_QPA_PLATFORM"] = "xcb"
+    
+        # 添加系统Qt插件路径
+        possible_plugin_paths = [
+            "/usr/lib/x86_64-linux-gnu/qt5/plugins",
+            "/usr/lib/qt/plugins",
+            "/usr/local/lib/qt/plugins",
+            os.path.join(sys.prefix, "plugins"),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "qt_plugins")
+        ]
+    
+        # 查找有效的插件路径
+        valid_plugin_path = None
+        for path in possible_plugin_paths:
+            xcb_plugin = os.path.join(path, "platforms", "libqxcb.so")
+            if os.path.exists(xcb_plugin):
+                valid_plugin_path = path
+                break
+    
+        if valid_plugin_path:
+            os.environ["QT_PLUGIN_PATH"] = valid_plugin_path
+        else:
+            print("警告: 未找到有效的Qt平台插件路径")
+        
+        # 调试信息
+        print(f"设置 QT_PLUGIN_PATH = {os.environ.get('QT_PLUGIN_PATH', '未设置')}")
+        print(f"设置 QT_QPA_PLATFORM = {os.environ.get('QT_QPA_PLATFORM', '未设置')}")
+
+    def setup_camera_signals(self):
+        """连接相机信号"""
+        self.camera_thread.change_pixmap_signal.connect(self.update_display)
+        self.camera_thread.camera_status_signal.connect(self.update_status)
+        self.camera_thread.connection_status_signal.connect(self.update_camera_buttons_state)
+        self.camera_thread.fps_signal.connect(self.update_fps)
+        self.camera_thread.flow_field_signal.connect(self.update_real_flow_field)
+        self.camera_thread.finished.connect(self.on_camera_finished)
+        self.camera_thread.error_occurred.connect(self.on_camera_error)
+
+    def connect_worker_signals(self):
+        """当worker创建后连接信号"""
+        if self.camera_thread.worker:
+            worker = self.camera_thread.worker
+            worker.change_pixmap_signal.connect(self.update_display)
+            worker.camera_status_signal.connect(self.update_status)
+            worker.connection_status_signal.connect(self.update_camera_buttons_state)
+            worker.fps_signal.connect(self.update_fps)
+            worker.flow_field_signal.connect(self.update_real_flow_field)
+            worker.finished.connect(self.on_camera_finished)
+    
+    def on_camera_finished(self):
+        """当相机线程完成时更新状态"""
+        self.update_camera_buttons_state(False)
+        self.clear_display("事件相机已关闭")
+        self.clear_flow_display("流场图未生成")
+        self.ui.statusbar.showMessage("事件相机已关闭")
+
+    def on_camera_error(self, error_msg):
+        """处理相机错误"""
+        self.ui.statusbar.showMessage(error_msg)
+        self.clear_display("相机错误")
+        self.clear_flow_display("流场计算失败")
+        self.update_camera_buttons_state(False)
+        
+        # 尝试恢复
+        QtCore.QTimer.singleShot(2000, lambda: self.ui.statusbar.showMessage("尝试重新连接..."))
+        QtCore.QTimer.singleShot(3000, self.link_camera)
 
     def label5_resized(self, event):
         """label5尺寸变化时触发"""
@@ -157,14 +237,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.pushButton_11.clicked.connect(self.delete_setup)
         self.ui.pushButton_12.clicked.connect(self.save_setup)
 
-    def setup_camera_signals(self):
-        # 连接摄像头线程的信号
-        self.camera_thread.change_pixmap_signal.connect(self.update_display)
-        self.camera_thread.camera_status_signal.connect(self.update_status)
-        self.camera_thread.connection_status_signal.connect(self.update_camera_buttons_state)
-        self.camera_thread.fps_signal.connect(self.update_fps)
-        self.camera_thread.flow_field_signal.connect(self.update_real_flow_field)  # 连接流场信号
-
     def update_real_flow_field(self, u, v):
         """更新真实流场数据（性能优化版）"""
         current_time = time.time()
@@ -228,30 +300,64 @@ class MainWindow(QtWidgets.QMainWindow):
             self.clear_flow_display("流场数据无效")
 
     def link_camera(self):
-        """连接摄像头"""
-        if not self.camera_thread.connected:
-            self.ui.statusbar.showMessage("正在连接摄像头...")
-            self.camera_thread.connect_camera()
+        """连接事件相机"""
+        if not self.camera_thread.is_connected():
+            self.ui.statusbar.showMessage("正在连接事件相机...")
+            # 启动线程
+            if not self.camera_thread.isRunning():
+                self.camera_thread.start()
         else:
-            self.ui.statusbar.showMessage("摄像头已连接")
+            self.ui.statusbar.showMessage("事件相机已连接")
 
     def open_camera(self):
-        """打开摄像头"""
-        if not self.camera_thread.connected:
-            self.ui.statusbar.showMessage("请先连接摄像头")
+        """打开事件相机"""
+        if not self.camera_thread.is_connected():
+            self.ui.statusbar.showMessage("请先连接事件相机")
             return
             
-        if self.camera_thread.isRunning():
-            self.camera_thread.stop()
-            
-        # 重置前一帧
-        self.camera_thread.prev_frame = None
-        
-        self.camera_thread.start()
-        self.ui.statusbar.showMessage("正在打开摄像头...")
+        if not self.camera_thread.isRunning():
+            # 启动线程
+            self.camera_thread.start()
+            self.ui.statusbar.showMessage("正在打开事件相机...")
+        else:
+            self.ui.statusbar.showMessage("事件相机已打开")
         
         # 清除流场显示
         self.clear_flow_display("计算流场中...")
+
+    def close_camera(self):
+        """关闭事件相机"""
+        if self.camera_thread.isRunning():
+            # 停止线程
+            self.camera_thread.stop()
+            
+            # 清除画面
+            self.clear_display("事件相机已关闭")
+            self.clear_flow_display("流场图未生成")
+            self.ui.statusbar.showMessage("事件相机已关闭")
+            
+            # 清除流场数据
+            self.flow_u = None
+            self.flow_v = None
+            
+            # 停止流场可视化线程
+            if self.flow_visualizer is not None:
+                self.flow_visualizer.stop()
+                self.flow_visualizer = None
+        else:
+            self.ui.statusbar.showMessage("事件相机未打开")
+            self.clear_display("事件相机未打开")
+            self.clear_flow_display("流场图未生成")
+            
+        self.update_camera_buttons_state(self.camera_thread.is_connected())
+        
+        if self.is_fullscreen:
+            self.exit_fullscreen()
+
+        # 清除保存的帧
+        self.last_camera_frame = None
+        self.last_flow_pixmap = None
+
 
     def set_camera(self):
         """设置摄像头"""
@@ -263,7 +369,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.statusbar.showMessage("正在设置摄像头...")
 
     def update_camera_buttons_state(self, connected):
-        """根据摄像头连接状态更新按钮状态"""
+        """根据相机状态更新按钮状态"""
         # 连接/断开按钮状态
         self.ui.actionNew_Experiment_5.setEnabled(not connected)  # 连接按钮
         self.ui.actionNew_Experiment_8.setEnabled(connected)      # 断开按钮
@@ -563,39 +669,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.clear_display("摄像头已连接，请点击'打开相机'")
         else:
             self.clear_display("摄像头未连接")
-
-    def close_camera(self):
-        """关闭摄像头 - 关键功能实现点"""
-        if self.camera_thread.isRunning():
-            # 停止线程
-            self.camera_thread.stop()
-            
-            # 清除画面
-            self.clear_display("摄像头已关闭")
-            self.clear_flow_display("流场图未生成")
-            self.ui.statusbar.showMessage("摄像头已关闭")
-            
-            # 清除流场数据
-            self.flow_u = None
-            self.flow_v = None
-            
-            # 停止流场可视化线程
-            if self.flow_visualizer is not None:
-                self.flow_visualizer.stop()
-                self.flow_visualizer = None
-        else:
-            self.ui.statusbar.showMessage("摄像头未打开")
-            self.clear_display("摄像头未打开")
-            self.clear_flow_display("流场图未生成")
-            
-        self.update_camera_buttons_state(self.camera_thread.connected)
-        
-        if self.is_fullscreen:
-            self.exit_fullscreen()
-
-        # 清除保存的帧
-        self.last_camera_frame = None
-        self.last_flow_pixmap = None
 
     def closeEvent(self, event):
         """窗口关闭时停止所有线程"""
